@@ -46,6 +46,7 @@ exports.Gateway = function(config){
  * @param gatewayB
  */
 exports.Link = function(gatewayA , gatewayB){
+    console.log(gatewayA)
    // Looks for a couple of IP in the same subnet
     console.log(ip.cidr(gatewayA.ipA))
     console.log(ip.cidr(gatewayA.ipB))
