@@ -1,9 +1,8 @@
 /**
  * Created by invernizzi on 21/10/14.
  *
- * Network object representation and tools
+ * Network object representation and utility functions
  */
-
 
 
 
@@ -22,10 +21,19 @@
 
 var ip = require('ip');
 
-
 exports.Network = function(config){
     this.subnet = config.subnet || null;
     this.name = config.name || null;
+    var self = this;
+    // For each gws check that at least an IP is onNet
+    if (config.gateways){
+        config.gateways.forEach(function(index , gw){
+            console.log(gw);
+            if (!(gw.ipOnSubnet(self.subnet))){
+                throw new Error("Error adding router "+gw.hostName+" to network "+self.subnet+": no interfaces on net");
+            }
+        });
+    }
     this.gws = config.gateways || null;
     this.links = config.links || null;
 }
@@ -49,7 +57,6 @@ exports.Gateway = function(config){
         return null;
     }
 }
-
 
 /**
  * * A Link between 2 routers
@@ -78,4 +85,6 @@ exports.Link = function(gatewayA , gatewayB , label){
         this.IPa = gatewayA.IPb;
         this.IPb = gatewayB.IPb;
     }
+    if (this.IPa === null || this.IPb === null)
+        throw new Error("Error creating a link between router "+gatewayA.hostName + " and " + gatewayB.hostName);
 }
