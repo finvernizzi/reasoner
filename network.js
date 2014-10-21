@@ -5,6 +5,8 @@
  */
 
 
+
+
 /**
  *
  * @param config
@@ -17,7 +19,11 @@
  *
  * @constructor
  */
-var Network = function(config){
+
+var ip = require('ip');
+
+
+exports.Network = function(config){
 
 }
 /**
@@ -27,7 +33,7 @@ var Network = function(config){
  *  IPb:
  *  hostName: the name of the host
  */
-var gateway = function(config){
+exports.Gateway = function(config){
     this.ipA = config.IPa || null;
     this.ipB = config.IPb || null;
     this.hostName = config.hostName || "";
@@ -39,6 +45,8 @@ var gateway = function(config){
  * @param gatewayA
  * @param gatewayB
  */
-var link = function(gatewayA , gatewayB){
+exports.Link = function(gatewayA , gatewayB){
    // Looks for a couple of IP in the same subnet
+    console.log(ip.cidr(gatewayA.ipA))
+    console.log(ip.cidr(gatewayA.ipB))
 }
