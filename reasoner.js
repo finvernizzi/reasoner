@@ -12,11 +12,19 @@ var gw1 = new network.Gateway({
 });
 var gw2 = new network.Gateway({
     IPa:"192.168.123.2/24",
-    IPb:"1.2.3.2/24",
-    hostName : "GW2"
+    IPb:"163.162.170.222/24",
+    hostName : "firewall"
 });
 
 var link1 = new network.Link(gw1 , gw2);
+var net1 = new network.Network({
+    name : "Test net",
+    subnet: "192.168.123.0/24",
+    gateways : [gw1],
+    links: [link1]
+})
 
 console.log(gw1.ipOnSubnet("192.168.123.123/24"));
 console.log(gw1.ipOnSubnet("192.168.121.123/24"));
+
+console.log(net1);

@@ -26,14 +26,8 @@ var ip = require('ip');
 exports.Network = function(config){
     this.subnet = config.subnet || null;
     this.name = config.name || null;
-    this.internalGwIPs = []; // IP from GWs that are ONnet
-    this.externalGwIPs = []; // // IP from GWs of the net that are OFFnet
-    // In a network we need to know which are IPs from gateway that i have ONnet and which OFFnet
-    if (config.gateways){
-        config.gateways.forEach(function(index , gw){
-            this.internalGwIPs
-        });
-    }
+    this.gws = config.gateways || null;
+    this.links = config.links || null;
 }
 /**
  * A gateway is a router with 2 IPs able to interconnect at IP level the 2 IP.
@@ -46,7 +40,7 @@ exports.Gateway = function(config){
     this.IPa = config.IPa || null;
     this.IPb = config.IPb || null;
     this.hostName = config.hostName || "";
-    // Utility function for checking which, if any, of my IP is on subnet
+    // Utility function for checking which, if any, of my IPs is on subnet
     this.ipOnSubnet = function(subnet){
         if (ip.cidr(this.IPa) === ip.cidr(subnet))
             return this.IPa;
