@@ -28,7 +28,6 @@ exports.Network = function(config){
     // For each gws check that at least an IP is onNet
     if (config.gateways){
         config.gateways.forEach(function(gw , index){
-            console.log(gw);
             if (!(gw.ipOnSubnet(self.subnet))){
                 throw new Error("Error adding routers "+gw.hostName+" to network "+self.subnet+": no interfaces on net");
             }
