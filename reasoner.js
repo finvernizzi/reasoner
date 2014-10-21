@@ -24,4 +24,5 @@ var net1 = new network.Network({
     links: [link1]
 });
 
+
 console.log(net1);
