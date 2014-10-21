@@ -46,8 +46,25 @@ exports.Gateway = function(config){
  * @param gatewayB
  */
 exports.Link = function(gatewayA , gatewayB){
-    console.log(gatewayA)
-   // Looks for a couple of IP in the same subnet
-    console.log(ip.cidr(gatewayA.IPa))
-    console.log(ip.cidr(gatewayA.IPb))
+    this.IPa = null;
+    this.IPb = null;
+    // Looks for a couple of IP in the same subnet
+    if (ip.cidr(gatewayA.IPa) === ip.cidr(gatewayB.IPa)){
+        this.IPa = gatewayA.IPa;
+        this.IPb = gatewayB.IPa;
+    }
+    if (ip.cidr(gatewayA.IPa) === ip.cidr(gatewayB.IPb)){
+        this.IPa = gatewayA.IPa;
+        this.IPb = gatewayB.IPb;
+    }
+    if (ip.cidr(gatewayA.IPb) === ip.cidr(gatewayB.IPa)){
+        this.IPa = gatewayA.IPb;
+        this.IPb = gatewayB.IPa;
+    }
+    if (ip.cidr(gatewayA.IPb) === ip.cidr(gatewayB.IPb)){
+        this.IPa = gatewayA.IPb;
+        this.IPb = gatewayB.IPb;
+    }
+    console.log(this.IPa);
+    console.log(this.IPb);
 }
