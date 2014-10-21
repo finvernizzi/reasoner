@@ -34,8 +34,8 @@ exports.Network = function(config){
  *  hostName: the name of the host
  */
 exports.Gateway = function(config){
-    this.ipA = config.IPa || null;
-    this.ipB = config.IPb || null;
+    this.IPa = config.IPa || null;
+    this.IPb = config.IPb || null;
     this.hostName = config.hostName || "";
 }
 
@@ -48,6 +48,6 @@ exports.Gateway = function(config){
 exports.Link = function(gatewayA , gatewayB){
     console.log(gatewayA)
    // Looks for a couple of IP in the same subnet
-    console.log(ip.cidr(gatewayA.ipA))
-    console.log(ip.cidr(gatewayA.ipB))
+    console.log(ip.cidr(gatewayA.IPa))
+    console.log(ip.cidr(gatewayA.IPb))
 }
