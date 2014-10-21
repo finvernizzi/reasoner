@@ -24,7 +24,16 @@ var ip = require('ip');
 
 
 exports.Network = function(config){
-
+    this.subnet = config.subnet || null;
+    this.name = config.name || null;
+    this.internalGwIPs = []; // IP from GWs that are ONnet
+    this.externalGwIPs = []; // // IP from GWs of the net that are OFFnet
+    // In a network we need to know which are IPs from gateway that i have ONnet and which OFFnet
+    if (config.gateways){
+        config.gateways.forEach(function(index , gw){
+            this.internalGwIPs
+        });
+    }
 }
 /**
  * A gateway is a router with 2 IPs able to interconnect at IP level the 2 IP.
@@ -37,17 +46,27 @@ exports.Gateway = function(config){
     this.IPa = config.IPa || null;
     this.IPb = config.IPb || null;
     this.hostName = config.hostName || "";
+    // Utility function for checking which, if any, of my IP is on subnet
+    this.ipOnSubnet = function(subnet){
+        if (ip.cidr(this.IPa) === ip.cidr(subnet))
+            return this.IPa;
+        if (ip.cidr(this.IPb) === ip.cidr(subnet))
+            return this.IPb;
+        return null;
+    }
 }
+
 
 /**
  * * A Link between 2 routers
- * The routers should have one of the IPs on the same subnet or a ErrorConnectingRouters will be leveraged
+ * The routers should have one of the IPs on the same subnet or the IPa and IPb will be null
  * @param gatewayA
  * @param gatewayB
  */
-exports.Link = function(gatewayA , gatewayB){
+exports.Link = function(gatewayA , gatewayB , label){
     this.IPa = null;
     this.IPb = null;
+    this.label = label || "";
     // Looks for a couple of IP in the same subnet
     if (ip.cidr(gatewayA.IPa) === ip.cidr(gatewayB.IPa)){
         this.IPa = gatewayA.IPa;
@@ -65,6 +84,4 @@ exports.Link = function(gatewayA , gatewayB){
         this.IPa = gatewayA.IPb;
         this.IPb = gatewayB.IPb;
     }
-    console.log(this.IPa);
-    console.log(this.IPb);
 }

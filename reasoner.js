@@ -17,3 +17,6 @@ var gw2 = new network.Gateway({
 });
 
 var link1 = new network.Link(gw1 , gw2);
+
+console.log(gw1.ipOnSubnet("192.168.123.123/24"));
+console.log(gw1.ipOnSubnet("192.168.121.123/24"));
