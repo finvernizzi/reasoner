@@ -30,7 +30,7 @@ exports.Network = function(config){
         config.gateways.forEach(function(index , gw){
             console.log(gw);
             if (!(gw.ipOnSubnet(self.subnet))){
-                throw new Error("Error adding router "+gw.hostName+" to network "+self.subnet+": no interfaces on net");
+                throw new Error("Error adding routers "+gw.hostName+" to network "+self.subnet+": no interfaces on net");
             }
         });
     }
