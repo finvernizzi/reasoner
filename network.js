@@ -42,12 +42,13 @@ exports.Network = function(config){
     this.subnet = config.subnet || UNSPECIFIED_NET;
     this.name = config.name || "";
     this.type = config.type || BROADCAST_NET;
+    this.description = config.description || "";
 
     var self = this;
     // For each gws check that at least an IP is onNet
     if (config.gateways){
         config.gateways.forEach(function(gw , index){
-            if (!(gw.ipOnSubnet(self.subnet))){
+            if ((gw.ipOnSubnet(self.subnet).length) == 0){
                 throw new Error("Error adding routers "+gw.hostName+" to network "+self.subnet+": no interfaces on net");
             }
         });
@@ -73,14 +74,18 @@ exports.Gateway = function(config){
     this.ipOnSubnet = function(subnet){
         var ret = [];
         for (var i=0 ; i<self.IPs.length; i++){
-            if (ip.cidr(self.IPs[i]) === ip.cidr(subnet))
+            if ((ip.cidr(self.IPs[i]) === ip.cidr(subnet)) || (subnet == UNSPECIFIED_NET))
                 ret.push(self.IPs[i]);
         }
         return ret;
     }
 }
 
-
+/**
+ * Simply read from a file a configuration(JSON format)
+ * @param fileName
+ * @returns {json definition|false}
+ */
 exports.importFromJson = function(fileName){
     var definitions;
     try {
@@ -88,8 +93,7 @@ exports.importFromJson = function(fileName){
     }
     catch (err) {
         console.log('There has been an error parsing the fileName file '+fileName)
-        console.log(err);
-        process.exit();
+        return false;
     }
-    console.log(definitions);
+    return definitions;
 }

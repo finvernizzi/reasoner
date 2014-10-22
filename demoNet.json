@@ -6,5 +6,28 @@
         "internet-gw":{
             "IPs":["192.168.123.129/30" , "163.162.170.197/27"]
         }
+    },
+    "networks":{
+        "serviceNet":{
+            "description" : "LAN dedicated to auxiliary services",
+            "subnet": "192.168.123.0/26",
+            "gateways" : ["soekrisGW"]
+        },
+        "internetUplink":{
+            "description" : "Uplink toward Internet access",
+            "subnet": "192.168.123.130/30",
+            "gateways" : ["internet-gw" , "soekris-gw"],
+            "type": "p2p"
+        },
+        "internet":{
+            "description" : "Internet",
+            "subnet": "163.162.170.197/27",
+            "gateways" : ["internet-gw"]
+        },
+        "userAccess":{
+            "description" : "User access LAN",
+            "subnet": "192.168.123.65/26",
+            "gateways" : ["soekris-gw"]
+        }
     }
 }
