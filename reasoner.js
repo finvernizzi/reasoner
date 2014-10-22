@@ -5,6 +5,8 @@
 
 var network=require("./network.js");
 
+network.importFromJson("./demoNet.json")
+
 var gw1 = new network.Gateway({
     IPa:"192.168.122.1/24",
     IPb:"1.2.3.1/24",

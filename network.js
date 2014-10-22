@@ -87,3 +87,8 @@ exports.Link = function(gatewayA , gatewayB , label){
     if (this.IPa === null || this.IPb === null)
         throw new Error("Error creating a link between router "+gatewayA.hostName + " and " + gatewayB.hostName);
 }
+
+exports.importFromJson = function(fileName){
+    var definitions = require(fileName);
+    console.log(definitions);
+}
