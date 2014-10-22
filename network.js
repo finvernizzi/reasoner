@@ -40,20 +40,22 @@ exports.Network = function(config){
 /**
  * A gateway is a router with 2 IPs able to interconnect at IP level the 2 IP.
  * @param config
- *  IPa:
- *  IPb:
+ *  IPs: array of IPs assigned to the gateway
  *  hostName: the name of the host
  */
 exports.Gateway = function(config){
-    this.IPa = config.IPa || null;
-    this.IPb = config.IPb || null;
+    if (Array.isArray(config.IPs))
+        this.IPs = config.IPs;
+    else
+        this.IPs = [];
+
     this.hostName = config.hostName || "";
     // Utility function for checking which, if any, of my IPs is on subnet
     this.ipOnSubnet = function(subnet){
-        if (ip.cidr(this.IPa) === ip.cidr(subnet))
-            return this.IPa;
-        if (ip.cidr(this.IPb) === ip.cidr(subnet))
-            return this.IPb;
+        for (var i=0 ; i<IPs.length; i++){
+            if (ip.cidr(this.IPs[i]) === ip.cidr(subnet))
+                return this.IPs[i];
+        }
         return null;
     }
 }

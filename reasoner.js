@@ -5,20 +5,14 @@
 
 var network=require("./network.js");
 
-network.importFromJson("./demoNet.json")
+//network.importFromJson("./demoNet.json")
 
 var gw1 = new network.Gateway({
-    IPa:"192.168.123.1/24",
-    IPb:"1.2.3.1/24",
+    IPs:["192.168.123.1/26" , "192.168.123.130/30" ,"192.168.123.65/26"]
     hostName : "GW1"
 });
-var gw2 = new network.Gateway({
-    IPa:"192.168.123.2/24",
-    IPb:"163.162.170.222/24",
-    hostName : "firewall"
-});
-var link1 = new network.Link(gw1 , gw2 , "Test link");
-
+//var link1 = new network.Link(gw1 , gw2 , "Test link");
+/*
 var net1 = new network.Network({
     name : "Test net",
     subnet: "192.168.123.0/24",
@@ -26,5 +20,5 @@ var net1 = new network.Network({
     links: [link1]
 });
 
-
-console.log(net1);
+*/
+console.log(gw1);
