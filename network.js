@@ -22,9 +22,27 @@
 var ip = require('ip'),
     fs = require('fs');
 
+var BROADCAST_NET = "lan";
+var P2P_NET = "p2p";
+exports.BROADCAST_NET = BROADCAST_NET;
+exports.P2P_NET = P2P_NET;
+
+var UNSPECIFIED_NET = "*";
+exports.UNSPECIFIED_NET = UNSPECIFIED_NET;
+
+/**
+ * A network (LAN). By default type is BROADCAST_NET, but can also be a p2p
+ * @param config
+ *      subnet: the subnet associated with this network
+ *      type: BROADCAST_NET | P2P_NET
+ *      name: name of the network
+ * @constructor
+ */
 exports.Network = function(config){
-    this.subnet = config.subnet || null;
-    this.name = config.name || null;
+    this.subnet = config.subnet || UNSPECIFIED_NET;
+    this.name = config.name || "";
+    this.type = config.type || BROADCAST_NET;
+
     var self = this;
     // For each gws check that at least an IP is onNet
     if (config.gateways){
@@ -35,10 +53,9 @@ exports.Network = function(config){
         });
     }
     this.gws = config.gateways || null;
-    this.links = config.links || null;
 }
 /**
- * A gateway is a router with 2 IPs able to interconnect at IP level the 2 IP.
+ * A gateway is a router with a number of IPs able to interconnect at IP level the differemt subtending networks.
  * @param config
  *  IPs: array of IPs assigned to the gateway
  *  hostName: the name of the host
@@ -48,48 +65,21 @@ exports.Gateway = function(config){
         this.IPs = config.IPs;
     else
         this.IPs = [];
+    var self = this;
 
     this.hostName = config.hostName || "";
     // Utility function for checking which, if any, of my IPs is on subnet
+    // Returns an array containing all the subnet
     this.ipOnSubnet = function(subnet){
-        for (var i=0 ; i<IPs.length; i++){
-            if (ip.cidr(this.IPs[i]) === ip.cidr(subnet))
-                return this.IPs[i];
+        var ret = [];
+        for (var i=0 ; i<self.IPs.length; i++){
+            if (ip.cidr(self.IPs[i]) === ip.cidr(subnet))
+                ret.push(self.IPs[i]);
         }
-        return null;
+        return ret;
     }
 }
 
-/**
- * * A Link between 2 routers
- * The routers should have one of the IPs on the same subnet or the IPa and IPb will be null
- * @param gatewayA
- * @param gatewayB
- */
-exports.Link = function(gatewayA , gatewayB , label){
-    this.IPa = null;
-    this.IPb = null;
-    this.label = label || "";
-    // Looks for a couple of IP in the same subnet
-    if (ip.cidr(gatewayA.IPa) === ip.cidr(gatewayB.IPa)){
-        this.IPa = gatewayA.IPa;
-        this.IPb = gatewayB.IPa;
-    }
-    if (ip.cidr(gatewayA.IPa) === ip.cidr(gatewayB.IPb)){
-        this.IPa = gatewayA.IPa;
-        this.IPb = gatewayB.IPb;
-    }
-    if (ip.cidr(gatewayA.IPb) === ip.cidr(gatewayB.IPa)){
-        this.IPa = gatewayA.IPb;
-        this.IPb = gatewayB.IPa;
-    }
-    if (ip.cidr(gatewayA.IPb) === ip.cidr(gatewayB.IPb)){
-        this.IPa = gatewayA.IPb;
-        this.IPb = gatewayB.IPb;
-    }
-    if (this.IPa === null || this.IPb === null)
-        throw new Error("Error creating a link between router "+gatewayA.hostName + " and " + gatewayB.hostName);
-}
 
 exports.importFromJson = function(fileName){
     var definitions;
