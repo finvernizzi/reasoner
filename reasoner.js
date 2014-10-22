@@ -8,7 +8,7 @@ var network=require("./network.js");
 //network.importFromJson("./demoNet.json")
 
 var gw1 = new network.Gateway({
-    IPs:["192.168.123.1/26" , "192.168.123.130/30" ,"192.168.123.65/26"]
+    IPs:["192.168.123.1/26" , "192.168.123.130/30" ,"192.168.123.65/26"],
     hostName : "GW1"
 });
 //var link1 = new network.Link(gw1 , gw2 , "Test link");
