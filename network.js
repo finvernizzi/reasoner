@@ -19,7 +19,8 @@
  * @constructor
  */
 
-var ip = require('ip');
+var ip = require('ip'),
+    fs = require('fs');
 
 exports.Network = function(config){
     this.subnet = config.subnet || null;
@@ -89,6 +90,14 @@ exports.Link = function(gatewayA , gatewayB , label){
 }
 
 exports.importFromJson = function(fileName){
-    var definitions = require(fileName);
+    var definitions;
+    try {
+        definitions = JSON.parse(fs.readFileSync(fileName));
+    }
+    catch (err) {
+        console.log('There has been an error parsing the fileName file '+fileName)
+        console.log(err);
+        process.exit();
+    }
     console.log(definitions);
 }
