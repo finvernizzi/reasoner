@@ -110,6 +110,8 @@ getSupervisorCapabilityes(function(err, caps){
    // __availableProbes = caps;
      // Update indexes
     _.each(caps, function(cap , DN){
+        console.log("--------------");
+        console.log(cap);
         var capability = new mplane.Capability(cap);
         if (!__availableProbes[DN])
             __availableProbes[DN] = [];
