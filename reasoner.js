@@ -213,16 +213,17 @@ function getNetworkSubnet(netID){
  * @param ip
  */
 function ipBelongsToNet(IPadd){
+    var ret = null;
     _.each(_.keys(__subnetIndex) , function(netId , index){
         var netInfo = ip.cidrSubnet(getNetworkSubnet(netId));
         //console.log(netInfo)
         console.log(IPadd + " - " + netInfo.firstAddress+" - "+netInfo.lastAddress)
         if ((ip.toLong(IPadd) >= ip.toLong(netInfo.firstAddress)) && (ip.toLong(IPadd) <= ip.toLong(netInfo.lastAddress))){
             console.log(netId)
-            return netId;
+            ret =  netId;
         }
     });
-    return null;
+    return ret;
 }
 
 function motd(){
