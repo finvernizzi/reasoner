@@ -7,13 +7,42 @@
 
 var NETWORK_DEFINITION = "./demoNet.json";
 var RTT_CAPABILITY = "mean.rtt";
-// Network we want to do reachability checks toward
-var DESTINATION_NET = "internet";
+var CONFIGFILE = "reasoner.json";
 
 var network=require("./network.js")
     ,_ = require("lodash")
     ,graphLib = require("graphlib")
-    ,ip = require("ip");
+    ,ip = require("ip")
+    ,mplane = require('mplane')
+    ,supervisor = require("mplane_http_transport");
+
+//-----------------------------------------------------------------------------------------------------------
+// READ CONFIG
+var configuration;
+try {
+    configuration = JSON.parse(fs.readFileSync(CONFIGFILE));
+}
+catch (err) {
+    console.log('There has been an error parsing the configuration file.')
+    console.log(err);
+    process.exit();
+}
+//-----------------------------------------------------------------------------------------------------------
+
+// Load the reference registry
+mplane.Element.initialize_registry(configuration.registry.file);
+
+// CLI params
+cli.parse({
+    supervisorHost:  ['b', 'Supervisor address', 'ip', configuration.supervisor.hostName],
+    supervisorPort:  ['p', 'Supervisor port', 'int', configuration.supervisor.listenPort],
+    SSL:['s', 'Use SSL in supervisor connections', 'bool', true],
+    ca:['c' , 'Certificate file of the Certification Auth' , 'string' , configuration.ssl.ca],
+    key:['k' , 'Key file of the client' , 'string' , configuration.ssl.key],
+    cert:['t' , 'Certificate file of the client' , 'string' , configuration.ssl.cert],
+    user:['u' , 'Login as user' , 'string' , 'demo']
+});
+
 
 motd();
 // Process name for ps
@@ -22,13 +51,7 @@ process.title = "mPlane reasoner";
 // Maps a subnet to network name(that is the label/id of nodes in netGraph)
 var __subnetIndex = {};
 // Index of usefull probes known from supervisor, indexed by subnet
-// TODO: populate it from supervisor
-// TODO: constraints!
-var __probes ={
-    "192.168.123.0/26":{
-        "pinger TI":[RTT_CAPABILITY]
-    }
-}
+var __probes ={};
 
 var netDef = network.importFromJson(NETWORK_DEFINITION);
 if (!netDef){
@@ -75,26 +98,50 @@ _.each(netDef.gateways , function(gw , gwName){
     }
 });
 info("...Edges created");
+
+getSupervisorCapabilityes(function(err, caps){
+    console.log(caps)
+
+})
+
+
+
 // Spanning tree , Dijstra tree from internet. All edge has the same weigth
 // TODO: use measure to change node weihtght?
 //var spanTree = graphLib.alg.prim(netGraph, function(){return 1;});
-var dijkstraTree = graphLib.alg.dijkstra(netGraph, DESTINATION_NET , function(){return 1;});
+//var dijkstraTree = graphLib.alg.dijkstra(netGraph, DESTINATION_NET , function(){return 1;});
 info("Graph created");
 info("..."+netGraph.nodeCount()+" networks");
 info("..."+netGraph.edgeCount()+" links");
 
-console.log(netGraph.sinks())
 
-/*
-{ serviceNet: { distance: 2, predecessor: 'internetUplink' },
-    internetUplink: { distance: 1, predecessor: 'internet' },
-    internet: { distance: 0 },
-    userAccess: { distance: 2, predecessor: 'internetUplink' } }
-*/
+/********************************************************************************************************************/
+// UTILITY FUNCTIONS
+/********************************************************************************************************************/
 
-
-
-
+/**
+ * Requests all the capabilities registered on the supervisor
+ * @param callback the function to call on completion
+ */
+function getSupervisorCapabilityes(callback){
+    supervisor.showCapabilities({
+            caFile : cli.options.ca,
+            keyFile : cli.options.key,
+            certFile : cli.options.cert,
+            host : cli.options.supervisorHost,
+            port: cli.options.supervisorPort
+        },
+        function(error , caps){
+            if (error){
+                showTitle("Error connecting to the supervisor."+error.toString());
+            }
+            if (_.keys(caps).length == 0){
+                showTitle("NO CAPABILITY registered on the supervisor");
+            }else{
+            }
+            callback(null, caps);
+        });
+}
 
 
 function motd(){
@@ -123,4 +170,25 @@ function motd(){
 
 function info(msg){
     console.log("..."+msg);
+}
+
+var pad = function (str, len , padChar) {
+    if (!padChar)
+        padChar = " ";
+    if (typeof len === 'undefined') {
+        len = str;
+        str = '';
+    }
+    if (str.length < len) {
+        len -= str.length;
+        while (len--) str += padChar;
+    }
+    return str;
+};
+
+// Utility function to show a title somehow formatted
+function showTitle(text){
+    console.log("\n\n"+pad("",text.length,"-"));
+    console.log(text);
+    console.log(pad("",text.length,"-")+"\n");
 }
