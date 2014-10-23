@@ -149,6 +149,7 @@ function getSupervisorCapabilityes(callback){
                 showTitle("NO CAPABILITY registered on the supervisor");
             }else{
                 _.keys(caps).forEach(function(DN){
+                    console.log(DN)
                     caps[DN].forEach(function(cap){
                         var capability = mplane.from_dict(cap);
                         ret.push({DN:capability});
