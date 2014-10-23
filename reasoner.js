@@ -116,14 +116,13 @@ getSupervisorCapabilityes(function(err, caps){
                 __availableProbes[DN] = [];
             capability.DN = DN;
             var index = (__availableProbes.push(capability))-1;
-            console.log(index)
             // If source.ip4 param is not present we have no way to know shere the probe is with respect of our net
             if (_.indexOf(capability.getParameterNames() , PARAM_PROBE_SOURCE) === -1){
                 showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
-                // console.log(capability);
             }else{
                 var sourceParamenter = capability.getParameter(PARAM_PROBE_SOURCE);
-                console.log(sourceParamenter.getConstraints())
+                var constraint = new mplane.Constraints(sourceParamenter.getConstraints()['0']);
+                console.log(constraint.getParam())
                 /*
                 if (!__IndexProbesByNet[sourceNet])
                     __IndexProbesByNet[sourceNet] = [];
@@ -132,8 +131,8 @@ getSupervisorCapabilityes(function(err, caps){
             }
         }); // caps of a DN
     });
-    console.log(__availableProbes)
-    console.log( __IndexProbesByNet)
+    //console.log(__availableProbes)
+    //console.log( __IndexProbesByNet)
     info(caps.length+" capabilities loaded from "+cli.options.supervisorHost);
 });
 
