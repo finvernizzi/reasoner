@@ -143,6 +143,7 @@ getSupervisorCapabilityes(function(err, caps){
     console.log( __IndexProbesByNet);
     console.log( __IndexProbesByType);
     console.log(getNetworkDetail('192.168.123.128', 'descriptiona'))
+    console.log(getNetworkDetail('192.168.123.128a', 'description'))
     info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
 });
 
