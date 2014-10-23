@@ -147,7 +147,7 @@ getSupervisorCapabilityes(function(err, caps){
     //console.log(getNetworkDetail('192.168.123.128', 'description'))
     */
     info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
-    doPathMeasure('192.168.143.0' , '163.162.170.192')
+    doPathMeasure('192.168.123.0' , '163.162.170.192')
 
 });
 
@@ -175,6 +175,54 @@ function doPathMeasure(fromNetID , toNetID){
     if (probesId.length == 0){
          showTitle("No avaiable probes to do measure from "+getNetworkDescription(fromNetID)+" to "+getNetworkDescription(toNetID));
     }
+
+    probesId.forEach(function(val , index){
+
+
+        var spec = new mplane.Specification(__availableProbes[val]);
+        console.log(spec)
+
+        /*
+        // FIXME: This is mandatory in RI! we don-t use it yet, so simply set a generic value
+        spec.set_when("now + 1s");
+        _.each(parValues, function (index, par) {
+            spec.setParameterValue(par, parValues[par]);
+        });
+        supervisor.registerSpecification(spec
+            ,DN
+            ,{
+                host: cli.options.supervisorHost,
+                port: cli.options.supervisorPort,
+                keyFile: cli.options.key,
+                certFile: cli.options.cert,
+                caFile: cli.options.ca
+            },
+            function (err, receipt) {
+                if (err)
+                    console.log(err);
+                else{
+                    // Register the receipt
+                    var rec = mplane.from_dict(JSON.parse(receipt));
+                    rec._eventTime = new Date(); // Informational
+                    // The RI does not set the label in the receipt
+                    // Since we have it from the spec, simply set it in the receipt
+                    rec.set_label(spec.get_label());
+                    if (!(rec instanceof mplane.Receipt)){
+                        cli.error("The returned message is not a valid Receipt");
+                    }else{
+                        // We keep local registry of all spec and relative receipts
+                        rec._specification = spec;
+                        __specification_receipts__.push(rec);
+                    }
+                }
+            });
+*/
+
+
+    })
+
+
+
 
 }
 
