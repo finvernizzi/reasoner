@@ -138,10 +138,11 @@ getSupervisorCapabilityes(function(err, caps){
         }); // caps of a DN
     });
     //console.log(__availableProbes);
-    console.log(__subnetIndex)
+    console.log(__subnetIndex , description);
     console.log(netDef);
     console.log( __IndexProbesByNet);
     console.log( __IndexProbesByType);
+    console.log(getNetworkDetail('192.168.123.128',))
     info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
 });
 
@@ -184,7 +185,16 @@ function getSupervisorCapabilityes(callback){
             }
         });
 }
-
+/**
+ * Given a netId (as stored in __subnetIndex, from ip.cidrSubnet(subnet)) returns a detail from netDef
+ * @param netId
+ * @param detail
+ */
+function getNetworkDetail(netId , detail){
+    if (!__subnetIndex[netId])
+        return null;
+    return netDef.networks[__subnetInde[netId]][detail];
+}
 
 function motd(){
     console.log();
