@@ -104,7 +104,8 @@ info("...Edges created");
 getSupervisorCapabilityes(function(err, caps){
     //console.log(caps)
     //caps.forEach(function(cap, index){
-    _.each(caps, function(cap){
+    _.each(caps, function(cap , DN){
+        console.log(DN)
         console.log(cap)
         // Looks if it is a usefull measure
         if (_.indexOf(cap.result_column_names(), RTT_CAPABILITY)){
