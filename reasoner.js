@@ -208,10 +208,10 @@ function getNetworkSubnet(netID){
  * Given an IP returns the indexID for __subnetIndex of the subnet it belongs, null if not belonging to any of the known nets
  * @param ip
  */
-function ipBelongsToNet(ip){
+function ipBelongsToNet(IPadd){
     _.each(_.keys(__subnetIndex) , function(netId , index){
         var netInfo = ip.cidrSubnet(getNetworkSubnet(netId));
-        if ((ip.toLong(ip) >= ip.tooLong(netInfo.firstAddress)) && (ip.toLong(ip) <= ip.tooLong(netInfo.lastAddress))){
+        if ((ip.toLong(IPadd) >= ip.tooLong(netInfo.firstAddress)) && (ip.toLong(IPadd) <= ip.tooLong(netInfo.lastAddress))){
             return netId;
         }
     });
