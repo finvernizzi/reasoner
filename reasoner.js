@@ -115,14 +115,14 @@ getSupervisorCapabilityes(function(err, caps){
             __availableProbes[DN] = [];
         capability.DN = DN;
         var index = __availableProbes.push(capability);
-        console.log()
+        console.log(capability)
         // If source.ip4 param is not present we have no way to know shere the probe is with respect of our net
         if (_.indexOf(capability.getParameterNames() , PARAM_PROBE_SOURCE) === -1){
             showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
-            console.log(capability);
+           // console.log(capability);
         }else{
             var sourceNet = capability.get_parameter_value(PARAM_PROBE_SOURCE);
-            console.log(sourceNet)
+            //console.log(sourceNet)
             if (!__IndexProbesByNet[sourceNet])
                 __IndexProbesByNet[sourceNet] = [];
             __IndexProbesByNet[sourceNet].push(index);
