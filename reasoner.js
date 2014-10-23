@@ -102,8 +102,11 @@ _.each(netDef.gateways , function(gw , gwName){
 info("...Edges created");
 
 getSupervisorCapabilityes(function(err, caps){
-    console.log(caps)
-    info("Capabilities loaded from "+cli.options.supervisorHost);
+    caps.forEach(function(cap, index){
+        console.log(cap)
+        console.log(cap.result_column_names());
+    })
+    info(caps.length+" capabilities loaded from "+cli.options.supervisorHost);
 });
 
 
