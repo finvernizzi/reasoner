@@ -102,14 +102,16 @@ _.each(netDef.gateways , function(gw , gwName){
 info("...Edges created");
 
 getSupervisorCapabilityes(function(err, caps){
-    console.log(caps)
-    caps.forEach(function(cap, index){
+    //console.log(caps)
+    //caps.forEach(function(cap, index){
+    _.each(caps, function(cap)){
+        console.log(cap)
         // Looks if it is a usefull measure
         if (_.indexOf(cap.result_column_names(), RTT_CAPABILITY)){
            // console.log()
         }
 
-    })
+    }
     info(caps.length+" capabilities loaded from "+cli.options.supervisorHost);
 });
 
@@ -149,7 +151,6 @@ function getSupervisorCapabilityes(callback){
                 showTitle("NO CAPABILITY registered on the supervisor");
             }else{
                 _.keys(caps).forEach(function(DN){
-                    console.log(DN)
                     caps[DN].forEach(function(cap){
                         var capability = mplane.from_dict(cap);
                         ret[DN] = capability;
