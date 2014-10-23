@@ -53,7 +53,8 @@ process.title = "mPlane reasoner";
 
 // Maps a subnet to network name(that is the label/id of nodes in netGraph)
 var __subnetIndex = {};
-var __availableProbes = {};
+// ARRAY contentente tutte le misure disponibili (gia obj capability). Il DN [ aggiunto come feature DN
+var __availableProbes = [];
 // Indexes for simply find available measures
 var __IndexProbesByNet ={};
 var __IndexProbesByType ={};
@@ -106,28 +107,31 @@ info("...Edges created");
 
 // Gets available capabilities and update indexes
 getSupervisorCapabilityes(function(err, caps){
-    __availableProbes = caps;
+   // __availableProbes = caps;
      // Update indexes
     _.each(caps, function(cap , DN){
-        console.log(cap.getParameterNames())
-        //console.log(DN)
-        //console.log(cap)
+        var capability = new mplane.Capability(cap);
+        if (!__availableProbes[DN])
+            __availableProbes[DN] = [];
+        capability.DN = DN;
+        var index = __availableProbes.push(capability);
         // If source.ip4 param is not present we have no way to know shere the probe is with respect of our net
-        if (_.indexOf(cap.getParameterNames , PARAM_PROBE_SOURCE) === -1){
+        if (_.indexOf(capability.getParameterNames , PARAM_PROBE_SOURCE) === -1){
             showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
-            console.log(cap);
+            console.log(capability);
         }else{
-            var sourceNet = cap.get_parameter_value(PARAM_PROBE_SOURCE);
+            var sourceNet = capability.get_parameter_value(PARAM_PROBE_SOURCE);
             console.log(sourceNet)
-            //if (!__IndexProbesByNet[])
-
+            if (!__IndexProbesByNet[sourceNet])
+                __IndexProbesByNet[sourceNet] = [];
+            __IndexProbesByNet[sourceNet].push(index);
         }
-
     });
     info(caps.length+" capabilities loaded from "+cli.options.supervisorHost);
 });
 
-
+console.log(__availableProbes)
+console.log( __IndexProbesByNet)
 
 // Spanning tree , Dijstra tree from internet. All edge has the same weigth
 // TODO: use measure to change node weihtght?
