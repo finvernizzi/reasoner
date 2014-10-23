@@ -130,11 +130,12 @@ getSupervisorCapabilityes(function(err, caps){
             }
         }); // caps of a DN
     });
+    console.log(__availableProbes)
+    console.log( __IndexProbesByNet)
     info(caps.length+" capabilities loaded from "+cli.options.supervisorHost);
 });
 
-console.log(__availableProbes)
-console.log( __IndexProbesByNet)
+
 
 // Spanning tree , Dijstra tree from internet. All edge has the same weigth
 // TODO: use measure to change node weihtght?
