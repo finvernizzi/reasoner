@@ -15,7 +15,8 @@ var network=require("./network.js")
     ,ip = require("ip")
     ,mplane = require('mplane')
     ,supervisor = require("mplane_http_transport")
-    ,fs = require("fs");
+    ,fs = require("fs")
+    ,cli = require("cli");
 
 //-----------------------------------------------------------------------------------------------------------
 // READ CONFIG
