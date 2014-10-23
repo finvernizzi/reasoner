@@ -14,7 +14,8 @@ var network=require("./network.js")
     ,graphLib = require("graphlib")
     ,ip = require("ip")
     ,mplane = require('mplane')
-    ,supervisor = require("mplane_http_transport");
+    ,supervisor = require("mplane_http_transport")
+    ,fs = require("fs");
 
 //-----------------------------------------------------------------------------------------------------------
 // READ CONFIG
