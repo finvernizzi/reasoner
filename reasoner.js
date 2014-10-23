@@ -193,7 +193,7 @@ function getSupervisorCapabilityes(callback){
 function getNetworkDetail(netId , detail){
     if (!__subnetIndex[netId])
         return null;
-    return netDef.networks[__subnetInde[netId]][detail];
+    return netDef.networks[__subnetIndex[netId]][detail];
 }
 
 function motd(){
