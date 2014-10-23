@@ -121,18 +121,17 @@ getSupervisorCapabilityes(function(err, caps){
                 showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
             }else{
                 var sourceParamenter = capability.getParameter(PARAM_PROBE_SOURCE);
-                var constraint = new mplane.Constraints(sourceParamenter.getConstraints()['0']);
-                console.log(constraint.getParam())
-                /*
-                if (!__IndexProbesByNet[sourceNet])
-                    __IndexProbesByNet[sourceNet] = [];
-                __IndexProbesByNet[sourceNet].push(index);
-                */
+                var ipSourceNet = ip new mplane.Constraints(sourceParamenter.getConstraints()['0']);
+
+                if (!__IndexProbesByNet[ipSourceNet])
+                    __IndexProbesByNet[ipSourceNet] = [];
+                __IndexProbesByNet[ipSourceNet].push(index);
+
             }
         }); // caps of a DN
     });
-    //console.log(__availableProbes)
-    //console.log( __IndexProbesByNet)
+    console.log(__availableProbes)
+    console.log( __IndexProbesByNet)
     info(caps.length+" capabilities loaded from "+cli.options.supervisorHost);
 });
 
