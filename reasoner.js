@@ -202,7 +202,7 @@ function getNetworkDetail(netId , detail){
 }
 // Wrap of getNetworkDetail for subnet info
 function getNetworkSubnet(netID){
-    return getNetworkDetail(netId , "subnet");
+    return getNetworkDetail(netID , "subnet");
 }
 /**
  * Given an IP returns the indexID for __subnetIndex of the subnet it belongs, null if not belonging to any of the known nets
