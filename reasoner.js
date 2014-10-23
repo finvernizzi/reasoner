@@ -132,7 +132,6 @@ getSupervisorCapabilityes(function(err, caps){
                 }
                 var capTypes = capability.result_column_names();
                 capTypes.forEach(function(type , i){
-                    console.log(type);
                     if (!__IndexProbesByType[type])
                         __IndexProbesByType[type] = [];
                     __IndexProbesByType[type].push(index);
@@ -141,11 +140,14 @@ getSupervisorCapabilityes(function(err, caps){
             }
         }); // caps of a DN
     });
+    /*
+    console.log();
     console.log(__subnetIndex );
     console.log(netDef);
     console.log( __IndexProbesByNet);
     console.log( __IndexProbesByType);
     //console.log(getNetworkDetail('192.168.123.128', 'description'))
+    */
     info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
 });
 
