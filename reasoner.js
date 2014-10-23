@@ -125,6 +125,7 @@ getSupervisorCapabilityes(function(err, caps){
                 var ipSourceNet = (new mplane.Constraints(sourceParamenter.getConstraints()['0'])).getParam();
                 if (!__IndexProbesByNet[ipSourceNet])
                     __IndexProbesByNet[ipSourceNet] = [];
+                __IndexProbesByNet[ipSourceNet].push(index);
                 var capTypes = capability.result_column_names();
                 capTypes.forEach(function(type , i){
                     console.log(type);
