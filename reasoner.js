@@ -113,7 +113,7 @@ getSupervisorCapabilityes(function(err, caps){
         capsDN.forEach(function(cap , index){
             console.log("--------------");
 
-            var capability = new mplane.Capability(cap);
+            var capability = mplane.from_dict(cap);
             console.log(capability);
             if (!__availableProbes[DN])
                 __availableProbes[DN] = [];
