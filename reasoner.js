@@ -151,7 +151,7 @@ function getSupervisorCapabilityes(callback){
                 _.keys(caps).forEach(function(DN){
                     caps[DN].forEach(function(cap){
                         var capability = mplane.from_dict(cap);
-                        ret.push(capability);
+                        ret.push({DN:capability});
                     });
                 });
             }
