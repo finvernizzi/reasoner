@@ -214,7 +214,7 @@ function ipBelongsToNet(IPadd){
         //console.log(netInfo)
         console.log(IPadd + " - " + netInfo.firstAddress+" - "+netInfo.lastAddress)
         if ((ip.toLong(IPadd) >= ip.toLong(netInfo.firstAddress)) && (ip.toLong(IPadd) <= ip.toLong(netInfo.lastAddress))){
-            console.log("OK")
+            console.log(netId)
             return netId;
         }
     });
