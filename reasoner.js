@@ -211,6 +211,7 @@ function getNetworkSubnet(netID){
 function ipBelongsToNet(IPadd){
     _.each(_.keys(__subnetIndex) , function(netId , index){
         var netInfo = ip.cidrSubnet(getNetworkSubnet(netId));
+        console.log(IPadd + " - " + netInfo.firstAddress+" - "+netInfo.lastAddress)
         if ((ip.toLong(IPadd) >= ip.toLong(netInfo.firstAddress)) && (ip.toLong(IPadd) <= ip.toLong(netInfo.lastAddress))){
             return netId;
         }
