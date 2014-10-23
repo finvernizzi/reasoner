@@ -122,11 +122,13 @@ getSupervisorCapabilityes(function(err, caps){
                 showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
                 // console.log(capability);
             }else{
-                var sourceNet = capability.get_parameter_value(PARAM_PROBE_SOURCE);
-                //console.log(sourceNet)
+                var sourceParamenter = capability.getParameter(PARAM_PROBE_SOURCE);
+                console.log(sourceParamenter.getConstraints)
+                /*
                 if (!__IndexProbesByNet[sourceNet])
                     __IndexProbesByNet[sourceNet] = [];
                 __IndexProbesByNet[sourceNet].push(index);
+                */
             }
         }); // caps of a DN
     });
