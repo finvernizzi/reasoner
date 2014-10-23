@@ -133,7 +133,7 @@ info("..."+netGraph.edgeCount()+" links");
  * @param callback the function to call on completion
  */
 function getSupervisorCapabilityes(callback){
-    var ret = [];
+    var ret = {};
     supervisor.showCapabilities({
             caFile : cli.options.ca,
             keyFile : cli.options.key,
@@ -152,7 +152,7 @@ function getSupervisorCapabilityes(callback){
                     console.log(DN)
                     caps[DN].forEach(function(cap){
                         var capability = mplane.from_dict(cap);
-                        ret.push({DN:capability});
+                        ret[DN] = capability;
                     });
                 });
             }
