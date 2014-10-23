@@ -151,12 +151,15 @@ function getSupervisorCapabilityes(callback){
             if (_.keys(caps).length == 0){
                 showTitle("NO CAPABILITY registered on the supervisor");
             }else{
-                _.keys(caps).forEach(function(DN){
+                callback(null, caps);
+                /*_.keys(caps).forEach(function(DN){
                     caps[DN].forEach(function(cap){
                         var capability = mplane.from_dict(cap);
-                        ret[DN] = capability;
+                        if (!ret[DN])
+                            ret[DN] = [];
+                        ret[DN].push(capability);
                     });
-                });
+                });*/
             }
             callback(null, ret);
         });
