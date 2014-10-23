@@ -138,10 +138,10 @@ getSupervisorCapabilityes(function(err, caps){
         }); // caps of a DN
     });
     //console.log(__availableProbes);
-    ipBelongsToNet("192.168.123.1")
-    ipBelongsToNet("192.168.123.131")
-    ipBelongsToNet("192.168.123.66")
-    ipBelongsToNet("192.168.123.65")
+    console.log(ipBelongsToNet("192.168.123.1"))
+    console.log(ipBelongsToNet("192.168.123.131"))
+    console.log(ipBelongsToNet("192.168.123.66"))
+    console.log(ipBelongsToNet("192.168.123.65"))
 
     console.log(__subnetIndex );
     console.log(netDef);
