@@ -165,6 +165,12 @@ info("..."+netGraph.edgeCount()+" links");
 /********************************************************************************************************************/
 // UTILITY FUNCTIONS
 /********************************************************************************************************************/
+/**
+ * Given 2 known network (netId for __subnetIndex), if it has a probe in from net check reachability of toNet
+ */
+function assestNetworks(){
+
+}
 
 /**
  * Requests all the capabilities registered on the supervisor
@@ -236,7 +242,7 @@ function motd(){
     console.log("    ###########################################");
 
     console.log();
-    console.log("               mPlane REASONER ");
+    console.log("               mPlane DEMO REASONER ");
     console.log();
     console.log("    An Intelligent Measurement Plane for Future \n         Network and Application Management");
     console.log();
