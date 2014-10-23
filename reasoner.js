@@ -139,6 +139,7 @@ getSupervisorCapabilityes(function(err, caps){
     });
     //console.log(__availableProbes);
     console.log(__subnetIndex)
+    console.log(netDef);
     console.log( __IndexProbesByNet);
     console.log( __IndexProbesByType);
     info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
