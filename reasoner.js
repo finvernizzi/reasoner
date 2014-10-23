@@ -6,7 +6,7 @@
  */
 
 var NETWORK_DEFINITION = "./demoNet.json";
-var RTT_CAPABILITY = "mean.rtt";
+var RTT_CAPABILITY = "delay.twoway";
 var CONFIGFILE = "reasoner.json";
 
 var network=require("./network.js")
@@ -102,9 +102,13 @@ _.each(netDef.gateways , function(gw , gwName){
 info("...Edges created");
 
 getSupervisorCapabilityes(function(err, caps){
+    console.log(caps)
     caps.forEach(function(cap, index){
-        console.log(cap)
-        console.log(cap.result_column_names());
+        // Looks if it is a usefull measure
+        if (_.indexOf(cap.result_column_names(), RTT_CAPABILITY)){
+           // console.log()
+        }
+
     })
     info(caps.length+" capabilities loaded from "+cli.options.supervisorHost);
 });
