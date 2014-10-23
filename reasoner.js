@@ -103,8 +103,8 @@ info("...Edges created");
 
 getSupervisorCapabilityes(function(err, caps){
     console.log(caps)
-
-})
+    info("Capabilities loaded from "+cli.options.supervisorHost);
+});
 
 
 
@@ -126,6 +126,7 @@ info("..."+netGraph.edgeCount()+" links");
  * @param callback the function to call on completion
  */
 function getSupervisorCapabilityes(callback){
+    var ret = null;
     supervisor.showCapabilities({
             caFile : cli.options.ca,
             keyFile : cli.options.key,
@@ -140,8 +141,14 @@ function getSupervisorCapabilityes(callback){
             if (_.keys(caps).length == 0){
                 showTitle("NO CAPABILITY registered on the supervisor");
             }else{
+                _.keys(caps).forEach(function(DN){
+                    caps[DN].forEach(function(cap){
+                        var capability = mplane.from_dict(cap);
+                        ret.push(capability);
+                    });
+                });
             }
-            callback(null, caps);
+            callback(null, ret);
         });
 }
 
