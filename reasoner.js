@@ -6,7 +6,7 @@
  */
 
 var NETWORK_DEFINITION = "./demoNet.json";
-var RTT_CAPABILITY = "delay.twoway";
+var REACHABILITY_CAPABILITY = "delay.twoway";
 var CONFIGFILE = "reasoner.json";
 var PARAM_PROBE_SOURCE = "source.ip4";
 
@@ -128,7 +128,6 @@ getSupervisorCapabilityes(function(err, caps){
                     if (!__IndexProbesByNet[netId])
                         __IndexProbesByNet[netId] = [];
                     __IndexProbesByNet[netId].push(index);
-
                 }
                 var capTypes = capability.result_column_names();
                 capTypes.forEach(function(type , i){
@@ -136,7 +135,6 @@ getSupervisorCapabilityes(function(err, caps){
                         __IndexProbesByType[type] = [];
                     __IndexProbesByType[type].push(index);
                 });
-
             }
         }); // caps of a DN
     });
@@ -161,16 +159,19 @@ info("Graph created");
 info("..."+netGraph.nodeCount()+" networks");
 info("..."+netGraph.edgeCount()+" links");
 
+doPathMeasure('192.168.123.0' , '163.162.170.192')
 
 /********************************************************************************************************************/
 // UTILITY FUNCTIONS
 /********************************************************************************************************************/
 /**
- * Given 2 known network (netId for __subnetIndex), if it has a probe in from net check reachability of toNet
+ * Given 2 known networks (netId for __subnetIndex), if it has a probe in fromNet, checks reachability of toNet
+ * Basically it require a probe to do some measure(s) (REACHABILITY_CAPABILITY) directly from A to B, without checking is intermediate nodes are present in the path
  */
-function assestNetworks(){
-
+function doPathMeasure(fromNetID , toNetID){
+    console.log(hasProbeType(fromNetID , REACHABILITY_CAPABILITY));
 }
+
 
 /**
  * Requests all the capabilities registered on the supervisor
@@ -224,6 +225,19 @@ function ipBelongsToNetId(IPadd){
     });
     return ret;
 }
+
+/**
+ * Checks if a net has a probe of given type
+ * @param netId
+ * @return an array of matching probeID if any or -1
+ */
+function hasProbeType(netId , type){
+    // Do we have the net and a valid probe?
+    if ((!__IndexProbesByNet[netId]) || (!__IndexProbesByType[type]))
+        return -1;
+    return _.intersection(__IndexProbesByType[type] , __IndexProbesByNet[netId]);
+}
+
 
 function motd(){
     console.log();
