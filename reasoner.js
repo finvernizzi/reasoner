@@ -147,6 +147,9 @@ getSupervisorCapabilityes(function(err, caps){
     //console.log(getNetworkDetail('192.168.123.128', 'description'))
     */
     info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
+
+    doPathMeasure('192.168.123.0' , '163.162.170.192')
+
 });
 
 
@@ -159,7 +162,7 @@ info("Graph created");
 info("..."+netGraph.nodeCount()+" networks");
 info("..."+netGraph.edgeCount()+" links");
 
-doPathMeasure('192.168.123.0' , '163.162.170.192')
+
 
 /********************************************************************************************************************/
 // UTILITY FUNCTIONS
