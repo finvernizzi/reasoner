@@ -137,10 +137,11 @@ getSupervisorCapabilityes(function(err, caps){
             }
         }); // caps of a DN
     });
-    console.log(__availableProbes);
+    //console.log(__availableProbes);
+    console.log(__subnetIndex)
     console.log( __IndexProbesByNet);
     console.log( __IndexProbesByType);
-    info(__availableProbes.length+" capabilities loaded from "+cli.options.supervisorHost);
+    info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
 });
 
 
