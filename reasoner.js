@@ -123,11 +123,13 @@ getSupervisorCapabilityes(function(err, caps){
             }else{
                 var sourceParamenter = capability.getParameter(PARAM_PROBE_SOURCE);
                 var ipSourceNet = (new mplane.Constraints(sourceParamenter.getConstraints()['0'])).getParam();
-                console.log("---"+ipSourceNet)
-                console.log(ipBelongsToNetId(ipSourceNet))
-                if (!__IndexProbesByNet[ipSourceNet])
-                    __IndexProbesByNet[ipSourceNet] = [];
-                __IndexProbesByNet[ipSourceNet].push(index);
+                var netId = ipBelongsToNetId(ipSourceNet);
+                if (netId){
+                    if (!__IndexProbesByNet[netId])
+                        __IndexProbesByNet[netId] = [];
+                    __IndexProbesByNet[netId].push(index);
+
+                }
                 var capTypes = capability.result_column_names();
                 capTypes.forEach(function(type , i){
                     console.log(type);
