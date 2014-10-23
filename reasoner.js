@@ -147,8 +147,7 @@ getSupervisorCapabilityes(function(err, caps){
     //console.log(getNetworkDetail('192.168.123.128', 'description'))
     */
     info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
-    console.log(__availableProbes);
-    doPathMeasure('192.168.123.0' , '163.162.170.192')
+    doPathMeasure('192.168.143.0' , '163.162.170.192')
 
 });
 
@@ -172,7 +171,11 @@ info("..."+netGraph.edgeCount()+" links");
  * Basically it require a probe to do some measure(s) (REACHABILITY_CAPABILITY) directly from A to B, without checking is intermediate nodes are present in the path
  */
 function doPathMeasure(fromNetID , toNetID){
-    console.log(hasProbeType(fromNetID , REACHABILITY_CAPABILITY));
+    var probesId = hasProbeType(fromNetID , REACHABILITY_CAPABILITY);
+    if (probesId.length ==0){
+         showTitle("No avaiable probes to do measure from "+getNetworkDescription(fromNetID)+" to "+getNetworkDescription(toNetID));
+    }
+
 }
 
 
@@ -213,6 +216,9 @@ function getNetworkDetail(netId , detail){
 // Wrap of getNetworkDetail for subnet info
 function getNetworkSubnet(netID){
     return getNetworkDetail(netID , "subnet");
+}
+function getNetworkDescription(netID){
+    return getNetworkDetail(netID , "description");
 }
 /**
  * Given an IP returns the indexID for __subnetIndex of the subnet it belongs, null if not belonging to any of the known nets
