@@ -109,26 +109,31 @@ info("...Edges created");
 getSupervisorCapabilityes(function(err, caps){
    // __availableProbes = caps;
      // Update indexes
-    _.each(caps, function(cap , DN){
-        console.log("--------------");
-        console.log(cap);
-        var capability = new mplane.Capability(cap);
-        if (!__availableProbes[DN])
-            __availableProbes[DN] = [];
-        capability.DN = DN;
-        var index = __availableProbes.push(capability);
-        console.log(capability)
-        // If source.ip4 param is not present we have no way to know shere the probe is with respect of our net
-        if (_.indexOf(capability.getParameterNames() , PARAM_PROBE_SOURCE) === -1){
-            showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
-           // console.log(capability);
-        }else{
-            var sourceNet = capability.get_parameter_value(PARAM_PROBE_SOURCE);
-            //console.log(sourceNet)
-            if (!__IndexProbesByNet[sourceNet])
-                __IndexProbesByNet[sourceNet] = [];
-            __IndexProbesByNet[sourceNet].push(index);
-        }
+    _.each(caps, function(capsDN , DN){
+        capsDN.forEach(function(cap , index){
+            console.log("--------------");
+            console.log(cap);
+            var capability = new mplane.Capability(cap);
+            if (!__availableProbes[DN])
+                __availableProbes[DN] = [];
+            capability.DN = DN;
+            var index = __availableProbes.push(capability);
+            console.log(capability)
+            // If source.ip4 param is not present we have no way to know shere the probe is with respect of our net
+            if (_.indexOf(capability.getParameterNames() , PARAM_PROBE_SOURCE) === -1){
+                showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
+                // console.log(capability);
+            }else{
+                var sourceNet = capability.get_parameter_value(PARAM_PROBE_SOURCE);
+                //console.log(sourceNet)
+                if (!__IndexProbesByNet[sourceNet])
+                    __IndexProbesByNet[sourceNet] = [];
+                __IndexProbesByNet[sourceNet].push(index);
+            }
+        }); // caps of a DN
+
+
+
     });
     info(caps.length+" capabilities loaded from "+cli.options.supervisorHost);
 });
