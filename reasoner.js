@@ -109,6 +109,7 @@ getSupervisorCapabilityes(function(err, caps){
     __availableProbes = caps;
      // Update indexes
     _.each(caps, function(cap , DN){
+        console.log(cap.getParameterNames())
         //console.log(DN)
         //console.log(cap)
         // If source.ip4 param is not present we have no way to know shere the probe is with respect of our net
