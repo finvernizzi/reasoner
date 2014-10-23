@@ -28,6 +28,21 @@
             "description" : "User access LAN",
             "subnet": "192.168.123.65/26",
             "gateways" : ["soekris-gw"]
+        },
+        "user_66":{
+            "description" : "DHCP User 66",
+            "subnet": "192.168.123.66/32",
+            "gateways" : ["soekris-gw"]
+        },
+        "user_67":{
+            "description" : "DHCP User 67",
+            "subnet": "192.168.123.67/32",
+            "gateways" : ["soekris-gw"]
+        },
+        "user_68":{
+            "description" : "DHCP User 68",
+            "subnet": "192.168.123.68/32",
+            "gateways" : ["soekris-gw"]
         }
     }
 }
