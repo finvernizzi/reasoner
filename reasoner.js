@@ -172,7 +172,7 @@ info("..."+netGraph.edgeCount()+" links");
  */
 function doPathMeasure(fromNetID , toNetID){
     var probesId = hasProbeType(fromNetID , REACHABILITY_CAPABILITY);
-    if (probesId.length ==0){
+    if (probesId.length == 0){
          showTitle("No avaiable probes to do measure from "+getNetworkDescription(fromNetID)+" to "+getNetworkDescription(toNetID));
     }
 
@@ -238,12 +238,12 @@ function ipBelongsToNetId(IPadd){
 /**
  * Checks if a net has a probe of given type
  * @param netId
- * @return an array of matching probeID if any or -1
+ * @return an array of matching probeID if any
  */
 function hasProbeType(netId , type){
     // Do we have the net and a valid probe?
     if ((!__IndexProbesByNet[netId]) || (!__IndexProbesByType[type]))
-        return -1;
+        return [];
     return _.intersection(__IndexProbesByType[type] , __IndexProbesByNet[netId]);
 }
 
