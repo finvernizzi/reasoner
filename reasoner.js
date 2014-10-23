@@ -140,7 +140,7 @@ getSupervisorCapabilityes(function(err, caps){
     console.log(__availableProbes);
     console.log( __IndexProbesByNet);
     console.log( __IndexProbesByType);
-    info((__availableProbes.length+" capabilities loaded from "+cli.options.supervisorHost);
+    info(__availableProbes.length+" capabilities loaded from "+cli.options.supervisorHost);
 });
 
 
