@@ -123,7 +123,7 @@ getSupervisorCapabilityes(function(err, caps){
                 // console.log(capability);
             }else{
                 var sourceParamenter = capability.getParameter(PARAM_PROBE_SOURCE);
-                console.log(sourceParamenter.getConstraints)
+                console.log(sourceParamenter.getConstraints())
                 /*
                 if (!__IndexProbesByNet[sourceNet])
                     __IndexProbesByNet[sourceNet] = [];
