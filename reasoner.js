@@ -115,23 +115,30 @@ getSupervisorCapabilityes(function(err, caps){
             if (!__availableProbes[DN])
                 __availableProbes[DN] = [];
             capability.DN = DN;
+            // Add to the known capabilities
             var index = (__availableProbes.push(capability))-1;
-            // If source.ip4 param is not present we have no way to know shere the probe is with respect of our net
+            // If source.ip4 param is not present we have no way to know where the probe is with respect of our net
             if (_.indexOf(capability.getParameterNames() , PARAM_PROBE_SOURCE) === -1){
                 showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
             }else{
                 var sourceParamenter = capability.getParameter(PARAM_PROBE_SOURCE);
                 var ipSourceNet = ip.cidr((new mplane.Constraints(sourceParamenter.getConstraints()['0'])).getParam());
-
                 if (!__IndexProbesByNet[ipSourceNet])
                     __IndexProbesByNet[ipSourceNet] = [];
-                __IndexProbesByNet[ipSourceNet].push(index);
+                var capTypes = capability.result_column_names();
+                capTypes.forEach(function(type , i){
+                    console.log(type);
+                    if (!__IndexProbesByType[type])
+                        __IndexProbesByType[type] = [];
+                    __IndexProbesByType[type].push(index);
+                });
 
             }
         }); // caps of a DN
     });
-    console.log(__availableProbes)
-    console.log( __IndexProbesByNet)
+    console.log(__availableProbes);
+    console.log( __IndexProbesByNet);
+    console.log( __IndexProbesByType);
     info(caps.length+" capabilities loaded from "+cli.options.supervisorHost);
 });
 
