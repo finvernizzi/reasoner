@@ -123,6 +123,8 @@ getSupervisorCapabilityes(function(err, caps){
             }else{
                 var sourceParamenter = capability.getParameter(PARAM_PROBE_SOURCE);
                 var ipSourceNet = (new mplane.Constraints(sourceParamenter.getConstraints()['0'])).getParam();
+                console.log("---"+ipSourceNet)
+                console.log(ipBelongsToNetId(ipSourceNet))
                 if (!__IndexProbesByNet[ipSourceNet])
                     __IndexProbesByNet[ipSourceNet] = [];
                 __IndexProbesByNet[ipSourceNet].push(index);
@@ -137,16 +139,6 @@ getSupervisorCapabilityes(function(err, caps){
             }
         }); // caps of a DN
     });
-    //console.log(__availableProbes);
-    console.log("-------------------------------------")
-    console.log(ipBelongsToNet("192.168.123.1"))
-    console.log("-------------------------------------")
-    console.log(ipBelongsToNet("192.168.123.131"))
-    console.log("-------------------------------------")
-    console.log(ipBelongsToNet("192.168.123.66"))
-    console.log("-------------------------------------")
-    console.log(ipBelongsToNet("192.168.123.65"))
-
     console.log(__subnetIndex );
     console.log(netDef);
     console.log( __IndexProbesByNet);
@@ -212,14 +204,11 @@ function getNetworkSubnet(netID){
  * Given an IP returns the indexID for __subnetIndex of the subnet it belongs, null if not belonging to any of the known nets
  * @param ip
  */
-function ipBelongsToNet(IPadd){
+function ipBelongsToNetId(IPadd){
     var ret = null;
     _.each(_.keys(__subnetIndex) , function(netId , index){
         var netInfo = ip.cidrSubnet(getNetworkSubnet(netId));
-        //console.log(netInfo)
-        console.log(IPadd + " - " + netInfo.firstAddress+" - "+netInfo.lastAddress)
         if ((ip.toLong(IPadd) >= ip.toLong(netInfo.firstAddress)) && (ip.toLong(IPadd) <= ip.toLong(netInfo.lastAddress))){
-            console.log(netId)
             ret =  netId;
         }
     });
