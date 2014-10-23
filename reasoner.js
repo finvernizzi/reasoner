@@ -51,7 +51,7 @@ motd();
 // Process name for ps
 process.title = "mPlane reasoner";
 
-// Maps a subnet to network name(that is the label/id of nodes in netGraph)
+// Maps a subnet to network name(that is the label/id of nodes in netGraph/netDef)
 var __subnetIndex = {};
 // ARRAY contentente tutte le misure disponibili (gia obj capability). Il DN [ aggiunto come feature DN
 var __availableProbes = [];
@@ -138,12 +138,16 @@ getSupervisorCapabilityes(function(err, caps){
         }); // caps of a DN
     });
     //console.log(__availableProbes);
+    ipBelongsToNet("192.168.123.1")
+    ipBelongsToNet("192.168.123.131")
+    ipBelongsToNet("192.168.123.66")
+    ipBelongsToNet("192.168.123.65")
+
     console.log(__subnetIndex );
     console.log(netDef);
     console.log( __IndexProbesByNet);
     console.log( __IndexProbesByType);
-    console.log(getNetworkDetail('192.168.123.128', 'descriptiona'))
-    console.log(getNetworkDetail('192.168.123.128a', 'description'))
+    //console.log(getNetworkDetail('192.168.123.128', 'description'))
     info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
 });
 
@@ -195,6 +199,23 @@ function getNetworkDetail(netId , detail){
     if (!__subnetIndex[netId])
         return null;
     return netDef.networks[__subnetIndex[netId]][detail];
+}
+// Wrap of getNetworkDetail for subnet info
+function getNetworkSubnet(netID){
+    return getNetworkDetail(netId , "subnet");
+}
+/**
+ * Given an IP returns the indexID for __subnetIndex of the subnet it belongs, null if not belonging to any of the known nets
+ * @param ip
+ */
+function ipBelongsToNet(ip){
+    _.each(_.keys(__subnetIndex) , function(netId , index){
+        var netInfo = ip.cidrSubnet(getNetworkSubnet(netId));
+        if ((ip.toLong(ip) >= ip.tooLong(netInfo.firstAddress)) && (ip.toLong(ip) <= ip.tooLong(netInfo.lastAddress))){
+            return netId;
+        }
+    });
+    return null;
 }
 
 function motd(){
