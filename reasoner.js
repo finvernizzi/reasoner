@@ -8,6 +8,7 @@
 var NETWORK_DEFINITION = "./demoNet.json";
 var RTT_CAPABILITY = "delay.twoway";
 var CONFIGFILE = "reasoner.json";
+var PARAM_PROBE_SOURCE = "source.ip4";
 
 var network=require("./network.js")
     ,_ = require("lodash")
@@ -52,8 +53,10 @@ process.title = "mPlane reasoner";
 
 // Maps a subnet to network name(that is the label/id of nodes in netGraph)
 var __subnetIndex = {};
-// Index of usefull probes known from supervisor, indexed by subnet
-var __probes ={};
+var __availableProbes = {};
+// Indexes for simply find available measures
+var __IndexProbesByNet ={};
+var __IndexProbesByType ={};
 
 var netDef = network.importFromJson(NETWORK_DEFINITION);
 if (!netDef){
@@ -101,15 +104,22 @@ _.each(netDef.gateways , function(gw , gwName){
 });
 info("...Edges created");
 
+// Gets available capabilities and update indexes
 getSupervisorCapabilityes(function(err, caps){
-    //console.log(caps)
-    //caps.forEach(function(cap, index){
+    __availableProbes = caps;
+     // Update indexes
     _.each(caps, function(cap , DN){
-        console.log(DN)
-        console.log(cap)
-        // Looks if it is a usefull measure
-        if (_.indexOf(cap.result_column_names(), RTT_CAPABILITY)){
-           // console.log()
+        //console.log(DN)
+        //console.log(cap)
+        // If source.ip4 param is not present we have no way to know shere the probe is with respect of our net
+        if (_.indexOf(cap.getParameterNames , PARAM_PROBE_SOURCE) === -1){
+            showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
+            console.log(cap);
+        }else{
+            var sourceNet = cap.get_parameter_value(PARAM_PROBE_SOURCE);
+            console.log(sourceNet)
+            //if (!__IndexProbesByNet[])
+
         }
 
     });
@@ -136,7 +146,6 @@ info("..."+netGraph.edgeCount()+" links");
  * @param callback the function to call on completion
  */
 function getSupervisorCapabilityes(callback){
-    var ret = {};
     supervisor.showCapabilities({
             caFile : cli.options.ca,
             keyFile : cli.options.key,
@@ -147,21 +156,14 @@ function getSupervisorCapabilityes(callback){
         function(error , caps){
             if (error){
                 showTitle("Error connecting to the supervisor."+error.toString());
+                callback(new Error("Error connecting to the supervisor."+error.toString()), null);
             }
             if (_.keys(caps).length == 0){
                 showTitle("NO CAPABILITY registered on the supervisor");
             }else{
                 callback(null, caps);
-                /*_.keys(caps).forEach(function(DN){
-                    caps[DN].forEach(function(cap){
-                        var capability = mplane.from_dict(cap);
-                        if (!ret[DN])
-                            ret[DN] = [];
-                        ret[DN].push(capability);
-                    });
-                });*/
             }
-            callback(null, ret);
+
         });
 }
 
