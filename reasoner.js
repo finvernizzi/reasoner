@@ -462,7 +462,7 @@ function motd(){
 }
 
 function info(msg){
-    cli.info(+msg);
+    cli.info(msg);
 }
 
 var pad = function (str, len , padChar) {
