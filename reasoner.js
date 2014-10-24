@@ -186,6 +186,9 @@ function doPathMeasures( fromNet , toNet ){
     //probesId.forEach(function(val , index){
     // Ramdomly select a probe from available ones
     var probe = __availableProbes[Math.floor(Math.random() * (probesId.length - 1) )];
+    console.log(probe)
+    console.log(__availableProbes[probe])
+
     var spec = new mplane.Specification(__availableProbes[probe]);
     console.log(spec);
     // Do we have a path?
@@ -305,7 +308,7 @@ function updateSPTree(){
     }
     //  Floyd-Warshall
     SPTree = graphLib.alg.floydWarshall(netGraph);
-    info("SPT calculated ( Floyd-Warshall )");
+    info("SPTs calculated ( Floyd-Warshall )");
     return true;
 }
 
