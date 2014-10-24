@@ -162,6 +162,7 @@ getSupervisorCapabilityes(function(err, caps){
     });
     info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
     console.log("\n");
+    checkStatus();
     doPathMeasures('serviceNet' , 'internet');
 });
 
@@ -186,8 +187,6 @@ function doPathMeasures( fromNet , toNet ){
          showTitle("No available probes to do measure from \'"+getNetworkDescription(fromNetID)+"\' to \'"+getNetworkDescription(toNetID)+"\'");
     }
 
-    // For each available capability on fromNet, register a Specification
-    //probesId.forEach(function(val , index){
     // Ramdomly select a probe from available ones
     var probe = __availableProbes[Math.floor(Math.random() * (probesId.length - 1) )];
     var spec = new mplane.Specification(probe);
@@ -234,32 +233,44 @@ function doPathMeasures( fromNet , toNet ){
                             // We keep local registry of all spec and relative receipts
                             rec._specification = spec;
                             __specification_receipts__.push(rec);
-                            //console.log(rec);
                         }
                     }
                 });
-
-
-        })
-    }
-/*
-        // FIXME: This is mandatory in RI! we don-t use it yet, so simply set a generic value
-        spec.set_when("now + 1s");
-        spec.setParameterValue("destination.ip4", parValues[par]);
-
-        _.each(parValues, function (index, par) {
-            spec.setParameterValue(par, parValues[par]);
         });
+    }
+}
 
-
-*/
-
-
-   // })
-
-
-
-
+/**
+ * Periodically checks if any result is available and trigger analysis module
+ */
+function checkStatus(){
+    info("-- Check status");
+    setInterval(function(){
+        __specification_receipts__.forEach(function(rec,index){
+            supervisor.showResults(new mplane.Redemption({receipt: rec}) , {
+                    host:cli.options.supervisorHost,
+                    port:cli.options.supervisorPort,
+                    ca:cli.options.ca,
+                    key:cli.options.key,
+                    cert:cli.options.cert
+                },
+                function(err , response){
+                    if (err){
+                        if (err.message == 403){
+                            // Not available
+                            callback(new Error("Result not availbale yet"),null);//Wrong answer
+                            return;
+                        }else{
+                            showTitle("Error:"+body);
+                            callback(new Error("Error from server"),null);//Wrong answer
+                            return;
+                        }
+                    }else {
+                        var result = mplane.from_dict(body);
+                    }
+                });
+        });
+    }, configuration.main.results_check_period || 10000);
 }
 
 

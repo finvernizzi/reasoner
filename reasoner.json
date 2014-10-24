@@ -4,7 +4,7 @@
         "version":"1.0",
         "description": "mPlane REASONER",
         "prompt_separator":"#",
-        "minimum_columns_required":150,
+        "results_check_period": 5000,
         "process_name": "mPlane Reasoner"
     },
     "supervisor":{
