@@ -200,6 +200,7 @@ function doPathMeasures( fromNet , toNet ){
         targetIps.forEach(function(curIP , index){
             spec.set_when("now + 1s");
             spec.setParameterValue("destination.ip4", curIP);
+            console.log(spec)
             supervisor.registerSpecification(
                 spec
                 ,probe.DN
