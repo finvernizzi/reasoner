@@ -294,15 +294,14 @@ function analyzeDelay(result , config){
         return;
     }
     setNetworkDetail(getNetworkID(result.toNet) , "status" , NET_STATUS_UNKNOWN );
-    console.log(result.get_result_column_values(REACHABILITY_CAPABILITY))
-    console.log(result)
-    if (result.get_result_column_values(REACHABILITY_CAPABILITY) >= configuration.delayAnalyzer.rttThresoldGood){
+    var RTT = (result.get_result_column_values(REACHABILITY_CAPABILITY))[0];
+    if (RTT >= configuration.delayAnalyzer.rttThresoldGood){
         setNetworkDetail(getNetworkID(result.toNet) , "status" , NET_STATUS_WARNING );
     }
-    if ((result.get_result_column_values(REACHABILITY_CAPABILITY) >= configuration.delayAnalyzer.rttThresoldGood) && (result.get_result_column_values(REACHABILITY_CAPABILITY) <= configuration.delayAnalyzer.rttThresoldBad)){
+    if ((RTT >= configuration.delayAnalyzer.rttThresoldGood) && (RTT <= configuration.delayAnalyzer.rttThresoldBad)){
         setNetworkDetail(getNetworkID(result.toNet) , "status" , NET_STATUS_WARNING );
     }
-    if (result.get_result_column_values(REACHABILITY_CAPABILITY) >= configuration.delayAnalyzer.rttThresoldBad){
+    if (RTT >= configuration.delayAnalyzer.rttThresoldBad){
         setNetworkDetail(getNetworkID(result.toNet) , "status" , NET_STATUS_NOK );
     }
     console.log(getNetworkDetail(getNetworkID(result.toNet) , "status"));
