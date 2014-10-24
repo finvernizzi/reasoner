@@ -186,13 +186,9 @@ function doPathMeasures( fromNet , toNet ){
     if (probesId.length == 0){
          showTitle("No available probes to do measure from \'"+getNetworkDescription(fromNetID)+"\' to \'"+getNetworkDescription(toNetID)+"\'");
     }
-
     // Ramdomly select a probe from available ones
     var probe = __availableProbes[Math.floor(Math.random() * (probesId.length - 1) )];
     var spec = new mplane.Specification(probe);
-
-    //console.log(constraint.getType())
-
     // Do we have a path?
     if (!SPTree[fromNet][toNet]){
         showTitle("No PATH available "+fromNet +"(" + fromNetID + ") -> "+toNet+"("+toNetID+")");
@@ -232,6 +228,8 @@ function doPathMeasures( fromNet , toNet ){
                         }else{
                             // We keep local registry of all spec and relative receipts
                             rec._specification = spec;
+                            rec.fromNet = fromNet;
+                            rec.toNet = toNet;
                             __specification_receipts__.push(rec);
                         }
                     }
@@ -241,7 +239,7 @@ function doPathMeasures( fromNet , toNet ){
 }
 
 /**
- * Periodically checks if any result is available and trigger analysis module
+ * Periodically checks if any result is available and if needed triggers analysis module
  */
 function checkStatus(){
     setInterval(function(){
@@ -266,14 +264,28 @@ function checkStatus(){
                             return;
                         }
                     }else {
+                        analyzeDelay(mplane.from_dict(body) , {
+                            fromNet:rec.specification.fromNet,
+                            toNet:rec.specification.toNet
+                        })
                         var result = mplane.from_dict(body);
-                        console.log(result);
                     }
                 });
         });
     }, configuration.main.results_check_period || 10000);
 }
 
+/**
+ *
+ * @param result
+ * @param config
+ *  fromNet: the net name from
+ *  toNet: the net name to
+ */
+function analyzeDelay(result , config){
+    console.log(config);
+    console.log(result);
+}
 
 /**
  * Requests all the capabilities registered on the supervisor
