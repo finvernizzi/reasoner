@@ -11,10 +11,10 @@ var REACHABILITY_CAPABILITY = "delay.twoway";
 var CONFIGFILE = "reasoner.json";
 var PARAM_PROBE_SOURCE = "source.ip4";
 var LEAF_GW = "__leaf__"; // ficticious gateway for labeling edges of LEAF nodes
-var NET_STATUS_UNKNOWN = "?";
+var NET_STATUS_UNKNOWN = "unknown";
 var NET_STATUS_OK = "ok";
-var NET_STATUS_WARNING = "--";
-var NET_STATUS_NOK = "nok";
+var NET_STATUS_WARNING = "warning";
+var NET_STATUS_NOK = "BAD";
 
 
 var network=require("./network.js")
@@ -168,7 +168,7 @@ getSupervisorCapabilityes(function(err, caps){
     info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
     console.log("\n");
     checkStatus();
-    doPathMeasures('serviceNet' , 'internet');
+    doPathMeasures('localhost' , 'internet');
 });
 
 
@@ -194,6 +194,7 @@ function doPathMeasures( fromNet , toNet ){
     // Ramdomly select a probe from available ones
     var probe = __availableProbes[Math.floor(Math.random() * (probesId.length - 1) )];
     var spec = new mplane.Specification(probe);
+
     // Do we have a path?
     if (!SPTree[fromNet][toNet]){
         showTitle("No PATH available "+fromNet +"(" + fromNetID + ") -> "+toNet+"("+toNetID+")");
@@ -201,16 +202,20 @@ function doPathMeasures( fromNet , toNet ){
         info("Registering measure: "+fromNet + "->" + toNet);
         // Array of IPs to be used ad target for our measures
         var targetIps = ipPath(fromNet , toNet);
-        targetIps.forEach(function(curIP , index){
-            spec.set_when("now + 1s");
-            spec.setParameterValue("destination.ip4", curIP);
-            spec.setParameterValue("source.ip4", probe.ipAddr);
-            if (probe.has_parameter("number"))
-                spec.setParameterValue('number', "7");
-            supervisor.registerSpecification(
+        targetIps.forEach(function(curIP , index) {
+            //(par.isValid(value) && par.met_by(value , undefined))
+            var destParam = probe.getParameter("destination.ip4");
+            if ((destParam.isValid(curIP) && destParam.met_by(curIP, undefined))){
+
+                spec.set_when("now + 1s");
+                spec.setParameterValue("destination.ip4", curIP);
+                spec.setParameterValue("source.ip4", probe.ipAddr);
+                if (probe.has_parameter("number"))
+                    spec.setParameterValue('number', "5");
+                supervisor.registerSpecification(
                 spec
-                ,probe.DN
-                ,{
+                , probe.DN
+                , {
                     host: cli.options.supervisorHost,
                     port: cli.options.supervisorPort,
                     keyFile: cli.options.key,
@@ -220,7 +225,7 @@ function doPathMeasures( fromNet , toNet ){
                 function (err, receipt) {
                     if (err)
                         console.log(err);
-                    else{
+                    else {
                         // Register the receipt
                         var rec = mplane.from_dict(JSON.parse(receipt));
                         rec._eventTime = new Date(); // Informational
@@ -228,9 +233,9 @@ function doPathMeasures( fromNet , toNet ){
                         // The RI does not set the label in the receipt
                         // Since we have it from the spec, simply set it in the receipt
                         rec.set_label(spec.get_label());
-                        if (!(rec instanceof mplane.Receipt)){
+                        if (!(rec instanceof mplane.Receipt)) {
                             cli.error("The returned message is not a valid Receipt");
-                        }else{
+                        } else {
                             // We keep local registry of all spec and relative receipts
                             rec._specification = spec;
                             rec.fromNet = fromNet;
@@ -239,6 +244,9 @@ function doPathMeasures( fromNet , toNet ){
                         }
                     }
                 });
+            }else{
+                cli.info(curIP + " not accepted");
+            }
         });
     }
 }
@@ -270,6 +278,7 @@ function checkStatus(){
                             return;
                         }
                     }else {
+                        //TODO: choose which analyzer has to be triggered from the resultType
                         analyzeDelay(mplane.from_dict(body) , {
                             fromNet:rec.fromNet,
                             toNet:rec.toNet
@@ -282,6 +291,7 @@ function checkStatus(){
 }
 
 /**
+ * Simple analyzer of rtt. Based on 2 thresholds (ok|warning|error)
  *
  * @param result
  * @param config
@@ -293,20 +303,28 @@ function analyzeDelay(result , config){
         cli.error("Malformed result received from supervisor");
         return;
     }
-    setNetworkDetail(getNetworkID(result.toNet) , "status" , NET_STATUS_UNKNOWN );
+    var curStatus = getNetworkStatus(getNetworkID(config.toNet));
+    //setNetworkDetail(getNetworkID(config.toNet) , "status" , NET_STATUS_UNKNOWN );
     var RTT = (result.get_result_column_values(REACHABILITY_CAPABILITY))[0];
-    console.log(RTT)
+    console.log(RTT);
+    if (RTT <= configuration.delayAnalyzer.rttThresoldGood){
+        setNetworkDetail(getNetworkID(config.toNet) , "status" , NET_STATUS_OK );
+    }
     if (RTT >= configuration.delayAnalyzer.rttThresoldGood){
-        setNetworkDetail(getNetworkID(result.toNet) , "status" , NET_STATUS_WARNING );
+        setNetworkDetail(getNetworkID(config.toNet) , "status" , NET_STATUS_WARNING );
     }
     if ((RTT >= configuration.delayAnalyzer.rttThresoldGood) && (RTT <= configuration.delayAnalyzer.rttThresoldBad)){
-        setNetworkDetail(getNetworkID(result.toNet) , "status" , NET_STATUS_WARNING );
+        setNetworkDetail(getNetworkID(config.toNet) , "status" , NET_STATUS_WARNING );
     }
     if (RTT >= configuration.delayAnalyzer.rttThresoldBad){
-        setNetworkDetail(getNetworkID(result.toNet) , "status" , NET_STATUS_NOK );
+        setNetworkDetail(getNetworkID(config.toNet) , "status" , NET_STATUS_NOK );
     }
-    console.log(getNetworkDetail(getNetworkID(result.toNet) , "status"));
+    if (!RTT)
+        setNetworkDetail(getNetworkID(config.toNet) , "status" , NET_STATUS_UNKNOWN );
+    if (curStatus != getNetworkStatus(getNetworkID(config.toNet)))
+        showTitle(getNetworkDescription(getNetworkID(config.toNet)) + " status: " + getNetworkStatus(getNetworkID(config.toNet)));
 }
+
 
 /**
  * Requests all the capabilities registered on the supervisor
@@ -343,9 +361,11 @@ function getNetworkDetail(netId , detail){
     return netDef.networks[__subnetIndex[netId]][detail];
 }
 function setNetworkDetail(netId , detail , value){
-    if (!__subnetIndex[netId])
+    if (!__subnetIndex[netId]){
+        cli.err("netId not defined:"+netId);
         return;
-    __subnetIndex[netId][detail] = value;
+    }
+    netDef.networks[__subnetIndex[netId]][detail] = value;
 }
 // Wrap of getNetworkDetail for subnet info
 function getNetworkSubnet(netID){
@@ -353,6 +373,9 @@ function getNetworkSubnet(netID){
 }
 function getNetworkDescription(netID){
     return getNetworkDetail(netID , "description");
+}
+function getNetworkStatus(netID){
+    return getNetworkDetail(netID , "status");
 }
 /**
  * Given a network name return the network ID, if any
