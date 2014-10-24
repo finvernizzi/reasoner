@@ -136,15 +136,15 @@ getSupervisorCapabilityes(function(err, caps){
             if (!__availableProbes[DN])
                 __availableProbes[DN] = [];
             capability.DN = DN;
-            // Add to the known capabilities
-            var index = (__availableProbes.push(capability))-1;
             // If source.ip4 param is not present we have no way to know where the probe is with respect of our net
             if (_.indexOf(capability.getParameterNames() , PARAM_PROBE_SOURCE) === -1){
                 showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
             }else{
                 var sourceParamenter = capability.getParameter(PARAM_PROBE_SOURCE);
                 var ipSourceNet = (new mplane.Constraints(sourceParamenter.getConstraints()['0'])).getParam();
-                __availableProbes[DN][index].ipAddr = ipSourceNet;
+                capability.ipAddr= ipSourceNet;
+                // Add to the known capabilities
+                var index = (__availableProbes.push(capability))-1;
                 var netId = ipBelongsToNetId(ipSourceNet);
                 if (netId){
                     if (!__IndexProbesByNet[netId])
