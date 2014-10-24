@@ -264,6 +264,7 @@ function checkStatus(){
                             return;
                         }
                     }else {
+                        console.log(rec)
                         analyzeDelay(mplane.from_dict(body) , {
                             fromNet:rec.specification.fromNet,
                             toNet:rec.specification.toNet
