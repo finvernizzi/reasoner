@@ -183,7 +183,7 @@ function doPathMeasures( fromNet , toNet ){
     var toNetID = getNetworkID(toNet);
     var probesId = hasProbeType(fromNetID , REACHABILITY_CAPABILITY);
     if (probesId.length == 0){
-         showTitle("No avaiable probes to do measure from \'"+getNetworkDescription(fromNetID)+"\' to \'"+getNetworkDescription(toNetID)+"\'");
+         showTitle("No available probes to do measure from \'"+getNetworkDescription(fromNetID)+"\' to \'"+getNetworkDescription(toNetID)+"\'");
     }
 
     // For each available capability on fromNet, register a Specification
@@ -200,6 +200,7 @@ function doPathMeasures( fromNet , toNet ){
         // Array of IPs to be used ad target for our measures
         var targetIps = ipPath(fromNet , toNet);
         targetIps.forEach(function(curIP , index){
+            console.log(spec)
             spec.set_when("now + 1s");
             spec.setParameterValue("destination.ip4", curIP);
            // spec.setParameterValue("source.ip4", probe.ipAddr);
