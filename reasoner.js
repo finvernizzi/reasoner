@@ -192,6 +192,8 @@ function doPathMeasures( fromNet , toNet ){
     var probe = __availableProbes[Math.floor(Math.random() * (probesId.length - 1) )];
     console.log(probe)
     var spec = new mplane.Specification(probe);
+    console.log(spec)
+
     // Do we have a path?
     if (!SPTree[fromNet][toNet]){
         showTitle("No PATH available "+fromNet +"(" + fromNetID + ") -> "+toNet+"("+toNetID+")");
@@ -203,7 +205,6 @@ function doPathMeasures( fromNet , toNet ){
             spec.set_when("now + 1s");
             spec.setParameterValue("destination.ip4", curIP);
             spec.setParameterValue("source.ip4", probe.ipAddr);
-            console.log(spec)
             supervisor.registerSpecification(
                 spec
                 ,probe.DN
