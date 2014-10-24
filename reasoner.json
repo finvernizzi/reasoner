@@ -19,5 +19,9 @@
         ,"cert": "../ca/certs/Reasoner-TI.crt"
         ,"ca": [ "../ca/root-ca/root-ca.crt" ]
         ,"requestCert" : true
+    },
+    "delayAnalyzer":{
+        "rttThresoldGood":0.20,
+        "rttThresoldBad":0.50
     }
 }

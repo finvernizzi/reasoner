@@ -11,6 +11,11 @@ var REACHABILITY_CAPABILITY = "delay.twoway";
 var CONFIGFILE = "reasoner.json";
 var PARAM_PROBE_SOURCE = "source.ip4";
 var LEAF_GW = "__leaf__"; // ficticious gateway for labeling edges of LEAF nodes
+var NET_STATUS_UNKNOWN = "?";
+var NET_STATUS_OK = "ok";
+var NET_STATUS_WARNING = "--";
+var NET_STATUS_NOK = "nok";
+
 
 var network=require("./network.js")
     ,_ = require("lodash")
@@ -284,8 +289,21 @@ function checkStatus(){
  *  toNet: the net name to
  */
 function analyzeDelay(result , config){
-    console.log(config);
-    console.log(result);
+    if (!(result instanceof mplane.Result)){
+        cli.error("Malformed result received from supervisor");
+        return;
+    }
+    setNetworkDetail(getNetworkID(result.toNet) , "status" , NET_STATUS_UNKNOWN );
+    if (result.get_result_column_values(REACHABILITY_CAPABILITY) >= config.delayAnalyzer.rttThresoldGood){
+        setNetworkDetail(getNetworkID(result.toNet) , "status" , NET_STATUS_WARNING );
+    }
+    if ((result.get_result_column_values(REACHABILITY_CAPABILITY) >= config.delayAnalyzer.rttThresoldGood) && (result.get_result_column_values(REACHABILITY_CAPABILITY) <= config.delayAnalyzer.rttThresoldBad)){
+        setNetworkDetail(getNetworkID(result.toNet) , "status" , NET_STATUS_WARNING );
+    }
+    if (result.get_result_column_values(REACHABILITY_CAPABILITY) >= config.delayAnalyzer.rttThresoldBad){
+        setNetworkDetail(getNetworkID(result.toNet) , "status" , NET_STATUS_NOK );
+    }
+    console.log(getNetworkDetail(getNetworkID(result.toNet) , "status"));
 }
 
 /**
@@ -321,6 +339,11 @@ function getNetworkDetail(netId , detail){
     if (!__subnetIndex[netId])
         return null;
     return netDef.networks[__subnetIndex[netId]][detail];
+}
+function setNetworkDetail(netId , detail , value){
+    if (!__subnetIndex[netId])
+        return;
+    __subnetIndex[netId][detail] = value;
 }
 // Wrap of getNetworkDetail for subnet info
 function getNetworkSubnet(netID){
