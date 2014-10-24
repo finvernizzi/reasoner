@@ -234,7 +234,7 @@ function doPathMeasures( fromNet , toNet ){
                             // We keep local registry of all spec and relative receipts
                             rec._specification = spec;
                             __specification_receipts__.push(rec);
-                            console.log(rec);
+                            //console.log(rec);
                         }
                     }
                 });
@@ -340,7 +340,6 @@ function ipPath(fromNet , toNet){
     // We do a backward path, from destination do source
     var e2e = SPTree[fromNet][toNet];
     var next = toNet;
-    console.log("---> "+next);
     for (var step=0; step<e2e.distance || next == fromNet; step++){
         // GW connecting next to the predecessor. The gw name is the label of the edge
         var gwIP = gatewayIpOnNet(netGraph.edge(next , SPTree[fromNet][next].predecessor) , next);
