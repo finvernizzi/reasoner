@@ -66,6 +66,9 @@ var __IndexProbesByType ={};
 //  Shortest Paths Tree
 var SPTree = null;
 
+// Pending specifications (reasoner receipts)
+var __specification_receipts__ = [];
+
 var netDef = network.importFromJson(NETWORK_DEFINITION);
 if (!netDef){
     console.error("Error reading from network definition file");
@@ -187,7 +190,6 @@ function doPathMeasures( fromNet , toNet ){
     // Ramdomly select a probe from available ones
     var probe = __availableProbes[Math.floor(Math.random() * (probesId.length - 1) )];
     var spec = new mplane.Specification(probe);
-    console.log(spec);
     // Do we have a path?
     if (!SPTree[fromNet][toNet]){
         showTitle("No PATH available "+fromNet +"(" + fromNetID + ") -> "+toNet+"("+toNetID+")");
@@ -197,6 +199,40 @@ function doPathMeasures( fromNet , toNet ){
         var targetIps = ipPath(fromNet , toNet);
         targetIps.forEach(function(curIP , index){
             spec.set_when("now + 1s");
+            spec.setParameterValue("destination.ip4", curIP);
+
+            supervisor.registerSpecification(spec
+                ,probe.DN
+                ,{
+                    host: cli.options.supervisorHost,
+                    port: cli.options.supervisorPort,
+                    keyFile: cli.options.key,
+                    certFile: cli.options.cert,
+                    caFile: cli.options.ca
+                },
+                function (err, receipt) {
+                    if (err)
+                        console.log(err);
+                    else{
+                        // Register the receipt
+                        var rec = mplane.from_dict(JSON.parse(receipt));
+                        rec._eventTime = new Date(); // Informational
+
+                        // The RI does not set the label in the receipt
+                        // Since we have it from the spec, simply set it in the receipt
+                        rec.set_label(spec.get_label());
+                        if (!(rec instanceof mplane.Receipt)){
+                            cli.error("The returned message is not a valid Receipt");
+                        }else{
+                            // We keep local registry of all spec and relative receipts
+                            rec._specification = spec;
+                            __specification_receipts__.push(rec);
+                            console.log(rec);
+                        }
+                    }
+                });
+
+
         })
     }
 /*
@@ -208,34 +244,7 @@ function doPathMeasures( fromNet , toNet ){
             spec.setParameterValue(par, parValues[par]);
         });
 
-        supervisor.registerSpecification(spec
-            ,DN
-            ,{
-                host: cli.options.supervisorHost,
-                port: cli.options.supervisorPort,
-                keyFile: cli.options.key,
-                certFile: cli.options.cert,
-                caFile: cli.options.ca
-            },
-            function (err, receipt) {
-                if (err)
-                    console.log(err);
-                else{
-                    // Register the receipt
-                    var rec = mplane.from_dict(JSON.parse(receipt));
-                    rec._eventTime = new Date(); // Informational
-                    // The RI does not set the label in the receipt
-                    // Since we have it from the spec, simply set it in the receipt
-                    rec.set_label(spec.get_label());
-                    if (!(rec instanceof mplane.Receipt)){
-                        cli.error("The returned message is not a valid Receipt");
-                    }else{
-                        // We keep local registry of all spec and relative receipts
-                        rec._specification = spec;
-                        __specification_receipts__.push(rec);
-                    }
-                }
-            });
+
 */
 
 
