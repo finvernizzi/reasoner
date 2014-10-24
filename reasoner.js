@@ -245,6 +245,7 @@ function checkStatus(){
     setInterval(function(){
         info("-- Check status");
         __specification_receipts__.forEach(function(rec,index){
+            delete __specification_receipts__[index];
             supervisor.showResults(new mplane.Redemption({receipt: rec}) , {
                     host:cli.options.supervisorHost,
                     port:cli.options.supervisorPort,
