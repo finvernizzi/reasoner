@@ -158,7 +158,7 @@ getSupervisorCapabilityes(function(err, caps){
     });
     info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
     console.log("\n");
-    doPathMeasures('localhost' , 'internet');
+    doPathMeasures('serviceNet' , 'internet');
 });
 
 
@@ -171,6 +171,7 @@ getSupervisorCapabilityes(function(err, caps){
 /**
  * Given 2 known networks names, if there is a probe in fromNet, checks reachability of toNet
  * Basically it requires a probe to do some measure(s) (REACHABILITY_CAPABILITY) from A to B, including all net on the PATH
+ * IF fromNet has more that one probe available, one is choosen RANDOMLY
  * The target for measure is the far-est IP of the GW from the source
  */
 function doPathMeasures( fromNet , toNet ){
@@ -182,18 +183,22 @@ function doPathMeasures( fromNet , toNet ){
     }
 
     // For each available capability on fromNet, register a Specification
-    probesId.forEach(function(val , index){
-        var spec = new mplane.Specification(__availableProbes[val]);
-        // Do we have a path?
-        //console.log(SPTree)
-        if (!SPTree[fromNet][toNet]){
-            showTitle("No PATH available "+fromNet +"(" + fromNetID + ") -> "+toNet+"("+toNetID+")");
-        }else{
-            console.log(fromNet + "->" + toNet);
-            var targetIps = ipPath(fromNet , toNet);
-            console.log("<><><>")
-            console.log(targetIps)
-        }
+    //probesId.forEach(function(val , index){
+    // Ramdomly select a probe from available ones
+    var probe = __availableProbes[Math.floor(Math.random() * (probesId.length - 1) )];
+    var spec = new mplane.Specification(__availableProbes[probe]);
+    console.log(spec);
+    // Do we have a path?
+    if (!SPTree[fromNet][toNet]){
+        showTitle("No PATH available "+fromNet +"(" + fromNetID + ") -> "+toNet+"("+toNetID+")");
+    }else{
+        console.log(fromNet + "->" + toNet);
+        // Array of IPs to be used ad target for our measures
+        var targetIps = ipPath(fromNet , toNet);
+        targetIps.forEach(function(curIP , index){
+            spec.set_when("now + 1s");
+        })
+    }
 /*
         // FIXME: This is mandatory in RI! we don-t use it yet, so simply set a generic value
         spec.set_when("now + 1s");
@@ -234,7 +239,7 @@ function doPathMeasures( fromNet , toNet ){
 */
 
 
-    })
+   // })
 
 
 
