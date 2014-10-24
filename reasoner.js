@@ -192,7 +192,7 @@ function doPathMeasures( fromNet , toNet ){
     var probe = __availableProbes[Math.floor(Math.random() * (probesId.length - 1) )];
     var spec = new mplane.Specification(probe);
 
-    console.log(constraint.getType())
+    //console.log(constraint.getType())
 
     // Do we have a path?
     if (!SPTree[fromNet][toNet]){
