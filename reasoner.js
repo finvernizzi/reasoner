@@ -198,18 +198,15 @@ function doPathMeasures( fromNet , toNet ){
     if (!SPTree[fromNet][toNet]){
         showTitle("No PATH available "+fromNet +"(" + fromNetID + ") -> "+toNet+"("+toNetID+")");
     }else{
-        console.log(fromNet + "->" + toNet);
+        info("Registering measure: "+fromNet + "->" + toNet);
         // Array of IPs to be used ad target for our measures
         var targetIps = ipPath(fromNet , toNet);
         targetIps.forEach(function(curIP , index){
-            console.log(spec)
             spec.set_when("now + 1s");
             spec.setParameterValue("destination.ip4", curIP);
             spec.setParameterValue("source.ip4", probe.ipAddr);
             if (probe.has_parameter("number"))
                 spec.setParameterValue('number', "7");
-            console.log(spec)
-
             supervisor.registerSpecification(
                 spec
                 ,probe.DN
@@ -465,7 +462,7 @@ function motd(){
 }
 
 function info(msg){
-    console.log("..."+msg);
+    fli.info(+msg);
 }
 
 var pad = function (str, len , padChar) {
