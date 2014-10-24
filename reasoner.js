@@ -190,7 +190,6 @@ function doPathMeasures( fromNet , toNet ){
     //probesId.forEach(function(val , index){
     // Ramdomly select a probe from available ones
     var probe = __availableProbes[Math.floor(Math.random() * (probesId.length - 1) )];
-    console.log(probe)
     var spec = new mplane.Specification(probe);
 
     // Do we have a path?
