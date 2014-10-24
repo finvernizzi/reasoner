@@ -339,7 +339,9 @@ function ipPath(fromNet , toNet){
         // GW connecting next to the predecessor. The gw name is the label of the edge
         var gwIP = gatewayIpOnNet(netGraph.edge(next , SPTree[fromNet][next].predecessor) , next);
         if (gwIP){
-            ret.push(gwIP);
+            // We need an IP without prefixLen, if any
+            var ipSplit=gwIP.split("/");
+            ret.push(ipSplit[0]);
         }
         next = SPTree[fromNet][next].predecessor;
     }
