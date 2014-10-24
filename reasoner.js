@@ -143,7 +143,8 @@ getSupervisorCapabilityes(function(err, caps){
                 showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
             }else{
                 var sourceParamenter = capability.getParameter(PARAM_PROBE_SOURCE);
-                console.log("Probe source IP"+sourceParamenter)
+                console.log("Probe source IP")
+                 console.log(sourceParamenter)
                 var ipSourceNet = (new mplane.Constraints(sourceParamenter.getConstraints()['0'])).getParam();
                 var netId = ipBelongsToNetId(ipSourceNet);
                 if (netId){
