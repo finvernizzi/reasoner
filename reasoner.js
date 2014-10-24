@@ -267,6 +267,7 @@ function checkStatus(){
                         }
                     }else {
                         var result = mplane.from_dict(body);
+                        console.log(result);
                     }
                 });
         });
