@@ -97,3 +97,11 @@ exports.importFromJson = function(fileName){
     }
     return definitions;
 }
+/**
+ * if the net includes a prefixlen, returns only the IP (es 192.168.123.1 out of 192.168.123.1/24)
+ * @param net
+ */
+exports.extractIp = function(net){
+    var ipSplit=net.split("/");
+    return ipSplit[0];
+}

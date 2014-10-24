@@ -143,6 +143,7 @@ getSupervisorCapabilityes(function(err, caps){
                 showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
             }else{
                 var sourceParamenter = capability.getParameter(PARAM_PROBE_SOURCE);
+                console.log("Probe source IP"+sourceParamenter)
                 var ipSourceNet = (new mplane.Constraints(sourceParamenter.getConstraints()['0'])).getParam();
                 var netId = ipBelongsToNetId(ipSourceNet);
                 if (netId){
@@ -189,6 +190,7 @@ function doPathMeasures( fromNet , toNet ){
     //probesId.forEach(function(val , index){
     // Ramdomly select a probe from available ones
     var probe = __availableProbes[Math.floor(Math.random() * (probesId.length - 1) )];
+    console.log(probe.getContrsints())
     var spec = new mplane.Specification(probe);
     // Do we have a path?
     if (!SPTree[fromNet][toNet]){
@@ -200,6 +202,7 @@ function doPathMeasures( fromNet , toNet ){
         targetIps.forEach(function(curIP , index){
             spec.set_when("now + 1s");
             spec.setParameterValue("destination.ip4", curIP);
+            spec.setParameterValue("source.ip4", );
             console.log(spec)
             supervisor.registerSpecification(
                 spec
@@ -339,9 +342,7 @@ function ipPath(fromNet , toNet){
         // GW connecting next to the predecessor. The gw name is the label of the edge
         var gwIP = gatewayIpOnNet(netGraph.edge(next , SPTree[fromNet][next].predecessor) , next);
         if (gwIP){
-            // We need an IP without prefixLen, if any
-            var ipSplit=gwIP.split("/");
-            ret.push(ipSplit[0]);
+            ret.push(network.extractIp(gwIP));
         }
         next = SPTree[fromNet][next].predecessor;
     }
