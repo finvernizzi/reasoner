@@ -143,10 +143,8 @@ getSupervisorCapabilityes(function(err, caps){
                 showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
             }else{
                 var sourceParamenter = capability.getParameter(PARAM_PROBE_SOURCE);
-                console.log("Probe source IP")
-                 console.log(sourceParamenter)
                 var ipSourceNet = (new mplane.Constraints(sourceParamenter.getConstraints()['0'])).getParam();
-                console.log(ipSourceNet)
+                __availableProbes[DN][index].ipAddr = ipSourceNet;
                 var netId = ipBelongsToNetId(ipSourceNet);
                 if (netId){
                     if (!__IndexProbesByNet[netId])
@@ -203,7 +201,7 @@ function doPathMeasures( fromNet , toNet ){
         targetIps.forEach(function(curIP , index){
             spec.set_when("now + 1s");
             spec.setParameterValue("destination.ip4", curIP);
-            //spec.setParameterValue("source.ip4", );
+            spec.setParameterValue("source.ip4", probe.ipAddr);
             console.log(spec)
             supervisor.registerSpecification(
                 spec
