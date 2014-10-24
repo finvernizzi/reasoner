@@ -183,8 +183,10 @@ getSupervisorCapabilityes(function(err, caps){
  * Basically it requires a probe to do some measure(s) (REACHABILITY_CAPABILITY) from A to B, including all net on the PATH
  * IF fromNet has more that one probe available, one is choosen RANDOMLY
  * The target for measure is the far-est IP of the GW from the source
+ *
+ * We can define which probe to use with probeID or a random one will be chosen
  */
-function doPathMeasures( fromNet , toNet ){
+function doPathMeasures( fromNet , toNet , probeID){
     var fromNetID = getNetworkID(fromNet);
     var toNetID = getNetworkID(toNet);
     var probesId = hasProbeType(fromNetID , REACHABILITY_CAPABILITY);
@@ -192,7 +194,7 @@ function doPathMeasures( fromNet , toNet ){
          showTitle("No available probes to do measure from \'"+getNetworkDescription(fromNetID)+"\' to \'"+getNetworkDescription(toNetID)+"\'");
     }
     // Ramdomly select a probe from available ones
-    var probe = __availableProbes[Math.floor(Math.random() * (probesId.length - 1) )];
+    var probe = __availableProbes[probeID || Math.floor(Math.random() * (probesId.length - 1) )];
     var spec = new mplane.Specification(probe);
 
     // Do we have a path?
@@ -203,10 +205,9 @@ function doPathMeasures( fromNet , toNet ){
         // Array of IPs to be used ad target for our measures
         var targetIps = ipPath(fromNet , toNet);
         targetIps.forEach(function(curIP , index) {
-            //(par.isValid(value) && par.met_by(value , undefined))
             var destParam = probe.getParameter("destination.ip4");
+            // Check if the destination is accepted by the probe
             if ((destParam.isValid(curIP) && destParam.met_by(curIP, undefined))){
-
                 spec.set_when("now + 1s");
                 spec.setParameterValue("destination.ip4", curIP);
                 spec.setParameterValue("source.ip4", probe.ipAddr);
