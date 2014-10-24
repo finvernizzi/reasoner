@@ -244,8 +244,8 @@ function doPathMeasures( fromNet , toNet ){
  * Periodically checks if any result is available and trigger analysis module
  */
 function checkStatus(){
-    info("-- Check status");
     setInterval(function(){
+        info("-- Check status");
         __specification_receipts__.forEach(function(rec,index){
             supervisor.showResults(new mplane.Redemption({receipt: rec}) , {
                     host:cli.options.supervisorHost,
