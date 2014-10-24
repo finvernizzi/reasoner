@@ -207,7 +207,7 @@ function doPathMeasures( fromNet , toNet ){
             spec.setParameterValue("destination.ip4", curIP);
             spec.setParameterValue("source.ip4", probe.ipAddr);
             if (probe.has_parameter("number"))
-                spec.setParameterValue("number", 7);
+                spec.setParameterValue("number", 3);
             console.log(spec)
 
             supervisor.registerSpecification(
