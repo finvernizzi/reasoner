@@ -295,6 +295,7 @@ function analyzeDelay(result , config){
     }
     setNetworkDetail(getNetworkID(result.toNet) , "status" , NET_STATUS_UNKNOWN );
     var RTT = (result.get_result_column_values(REACHABILITY_CAPABILITY))[0];
+    console.log(RTT)
     if (RTT >= configuration.delayAnalyzer.rttThresoldGood){
         setNetworkDetail(getNetworkID(result.toNet) , "status" , NET_STATUS_WARNING );
     }
