@@ -203,7 +203,7 @@ function doPathMeasures( fromNet , toNet ){
             console.log(spec)
             spec.set_when("now + 1s");
             spec.setParameterValue("destination.ip4", curIP);
-           // spec.setParameterValue("source.ip4", probe.ipAddr);
+            spec.setParameterValue("source.ip4", probe.ipAddr);
             if (probe.has_parameter("number"))
                 spec.setParameterValue("number", 5);
             console.log(spec)
