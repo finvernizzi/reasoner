@@ -1,7 +1,7 @@
 {
     "gateways":{
         "soekris-gw":{
-            "IPs":["192.168.123.1/26" , "192.168.123.130/30" ,"192.168.123.65/26"]
+            "IPs":["192.168.123.1/26" , "192.168.123.130/30" ,"192.168.123.65/26" , "127.0.0.1/32"]
         },
         "internet-gw":{
             "IPs":["192.168.123.129/30" , "163.162.170.197/27"]
@@ -15,7 +15,7 @@
         },
         "internetUplink":{
             "description" : "Uplink toward Internet access",
-            "subnet": "192.168.123.130/30",
+            "subnet": "192.168.123.128/30",
             "gateways" : ["internet-gw" , "soekris-gw"],
             "type": "p2p"
         },
@@ -27,6 +27,11 @@
         "userAccess":{
             "description" : "User access LAN",
             "subnet": "192.168.123.65/26",
+            "gateways" : ["soekris-gw"]
+        },
+	    "localhost":{
+            "description" : "User access LOCALHOST - TEST only",
+            "subnet": "127.0.0.1/32",
             "gateways" : ["soekris-gw"]
         },
         "user_66":{

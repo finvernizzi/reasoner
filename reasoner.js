@@ -1,6 +1,7 @@
 /**
  * Created by fabrizio.invernizzi@telecomitalia.it on 21/10/14.
  * Reasoner imports net definitions from json an build a graph representation (graphlib) of it with some simple assumption.
+ * Creating the graph, subnets of a net are considered "leafs" and a link is automaticcally created. Usefull for adding, for example, an host as a node to a subnet
  * No routing info are considered!
  * We can also add nodes adding /32 as subnet.
  */
@@ -9,6 +10,7 @@ var NETWORK_DEFINITION = "./demoNet.json";
 var REACHABILITY_CAPABILITY = "delay.twoway";
 var CONFIGFILE = "reasoner.json";
 var PARAM_PROBE_SOURCE = "source.ip4";
+var LEAF_GW = "__leaf__"; // ficticious gateway for labeling edges of LEAF nodes
 
 var network=require("./network.js")
     ,_ = require("lodash")
@@ -51,63 +53,79 @@ motd();
 // Process name for ps
 process.title = "mPlane reasoner";
 
-// Maps a subnet to network name(that is the label/id of nodes in netGraph/netDef)
+// Maps a subnet(ip.cidr()) to network name(that is the label/id of nodes in netGraph/netDef)
+// This is the base index for finding all nodes/edges
 var __subnetIndex = {};
+// The dual of __subnetIndex: from a  net name to a net index
+var __netNameIndex = {};
 // ARRAY contentente tutte le misure disponibili (gia obj capability). Il DN [ aggiunto come feature DN
 var __availableProbes = [];
 // Indexes for simply find available measures
 var __IndexProbesByNet ={};
 var __IndexProbesByType ={};
+//  Shortest Paths Tree
+var SPTree = null;
 
 var netDef = network.importFromJson(NETWORK_DEFINITION);
 if (!netDef){
     console.error("Error reading from network definition file");
     process.exit();
 }
-info("Network definitions loaded");
+info("Network definitions loaded\n");
+
+info("Checking for leafs ...");
+checkForLeafs(netDef);
+console.log();
 
 // Import networks/gateways to generate a graph representation
-var netGraph = new graphLib.Graph({ directed: false});
+var netGraph = new graphLib.Graph({ directed: true});
 // Graph label
 netGraph.setGraph("mPlane DEMO NET");
 // Graph nodes
 _.each(netDef.networks , function(net , netName){
     netGraph.setNode(netName , net.description);
-    if (net.subnet == network.UNSPECIFIED_NET)
+    if (net.subnet == network.UNSPECIFIED_NET){
         __subnetIndex[network.UNSPECIFIED_NET] = netName; //INDEXED
-    else
-        __subnetIndex[ip.cidr(net.subnet)] = netName; //INDEXED
-});
-info("...Subnet nodes edges created");
-// add edges for /32 subnets. These nets should have only 1 gw
-_.each(netDef.networks , function(net , netName){
-    var netInfo = ip.cidrSubnet(net.subnet)
-    if (netInfo.subnetMaskLength == 32){
-        var gw = netDef.gateways[net.gateways[0]]; // Default gw of the host
-        for (var i=0; i<gw.IPs.length;i++) {
-            if (netInfo.networkAddress != ip.cidr(gw.IPs[i])){
-                netGraph.setEdge(netName, __subnetIndex[ip.cidr(gw.IPs[i])] , net.gateways[0]);
-            }
-        }
+        __netNameIndex[netName] = network.UNSPECIFIED_NET;
     }
+    else{
+        __subnetIndex[ip.cidr(net.subnet)] = netName; //INDEXED
+        __netNameIndex[netName] = ip.cidr(net.subnet);
+    }
+
 });
-info("...Host nodes linked");
+info("Subnet nodes edges created");
+// LEAFS edges!
+ _.each(netDef.networks , function(net , netName){
+     if (net.leafOf){
+         netGraph.setEdge(netName, networkName(net.leafOf) , LEAF_GW);
+         netGraph.setEdge( networkName(net.leafOf) , netName , LEAF_GW);
+     }
+ });
+ info("Leaf nodes linked");
+
 // Graph edges from gateways
 // Edges are identified using subnets
 _.each(netDef.gateways , function(gw , gwName){
     for (var i=0; i<gw.IPs.length ; i++){
-        for (var j=i+1; j<gw.IPs.length;j++){
-            // Subnet is the id of the node
-            // We use the GW name as label of the edge
-            netGraph.setEdge(__subnetIndex[ip.cidr(gw.IPs[i])] , __subnetIndex[ip.cidr(gw.IPs[j])] , gwName );
+        for (var j=0; j<gw.IPs.length;j++){
+            if (i != j){
+                // Subnet is the id of the node
+                // We use the GW name as label of the edge for seamlessly retrive the connecting GW
+                netGraph.setEdge(networkName(ip.cidr(gw.IPs[i])) , networkName(ip.cidr(gw.IPs[j])) , gwName );
+                netGraph.setEdge( networkName(ip.cidr(gw.IPs[j])) , networkName(ip.cidr(gw.IPs[i])) ,gwName );
+            }
         }
     }
 });
-info("...Edges created");
+info("Edges created");
+info("Graph created");
+info("..."+netGraph.nodeCount()+" networks");
+info("..."+netGraph.edgeCount()+" links");
+updateSPTree();
 
 // Gets available capabilities and update indexes
 getSupervisorCapabilityes(function(err, caps){
-   // __availableProbes = caps;
      // Update indexes
     _.each(caps, function(capsDN , DN){
         capsDN.forEach(function(cap , index){
@@ -138,28 +156,12 @@ getSupervisorCapabilityes(function(err, caps){
             }
         }); // caps of a DN
     });
-    /*
-    console.log();
-    console.log(__subnetIndex );
-    console.log(netDef);
-    console.log( __IndexProbesByNet);
-    console.log( __IndexProbesByType);
-    //console.log(getNetworkDetail('192.168.123.128', 'description'))
-    */
     info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
-    doPathMeasure('192.168.123.0' , '163.162.170.192')
-
+    console.log("\n");
+    doPathMeasures('localhost' , 'internet');
 });
 
 
-
-// Spanning tree , Dijstra tree from internet. All edge has the same weigth
-// TODO: use measure to change node weihtght?
-//var spanTree = graphLib.alg.prim(netGraph, function(){return 1;});
-//var dijkstraTree = graphLib.alg.dijkstra(netGraph, DESTINATION_NET , function(){return 1;});
-info("Graph created");
-info("..."+netGraph.nodeCount()+" networks");
-info("..."+netGraph.edgeCount()+" links");
 
 
 
@@ -167,27 +169,40 @@ info("..."+netGraph.edgeCount()+" links");
 // UTILITY FUNCTIONS
 /********************************************************************************************************************/
 /**
- * Given 2 known networks (netId for __subnetIndex), if it has a probe in fromNet, checks reachability of toNet
- * Basically it require a probe to do some measure(s) (REACHABILITY_CAPABILITY) directly from A to B, without checking is intermediate nodes are present in the path
+ * Given 2 known networks names, if there is a probe in fromNet, checks reachability of toNet
+ * Basically it requires a probe to do some measure(s) (REACHABILITY_CAPABILITY) from A to B, including all net on the PATH
+ * The target for measure is the far-est IP of the GW from the source
  */
-function doPathMeasure(fromNetID , toNetID){
+function doPathMeasures( fromNet , toNet ){
+    var fromNetID = getNetworkID(fromNet);
+    var toNetID = getNetworkID(toNet);
     var probesId = hasProbeType(fromNetID , REACHABILITY_CAPABILITY);
     if (probesId.length == 0){
-         showTitle("No avaiable probes to do measure from "+getNetworkDescription(fromNetID)+" to "+getNetworkDescription(toNetID));
+         showTitle("No avaiable probes to do measure from \'"+getNetworkDescription(fromNetID)+"\' to \'"+getNetworkDescription(toNetID)+"\'");
     }
 
+    // For each available capability on fromNet, register a Specification
     probesId.forEach(function(val , index){
-
-
         var spec = new mplane.Specification(__availableProbes[val]);
-        console.log(spec)
-
-        /*
+        // Do we have a path?
+        //console.log(SPTree)
+        if (!SPTree[fromNet][toNet]){
+            showTitle("No PATH available "+fromNet +"(" + fromNetID + ") -> "+toNet+"("+toNetID+")");
+        }else{
+            console.log(fromNet + "->" + toNet);
+            var targetIps = ipPath(fromNet , toNet);
+            console.log("<><><>")
+            console.log(targetIps)
+        }
+/*
         // FIXME: This is mandatory in RI! we don-t use it yet, so simply set a generic value
         spec.set_when("now + 1s");
+        spec.setParameterValue("destination.ip4", parValues[par]);
+
         _.each(parValues, function (index, par) {
             spec.setParameterValue(par, parValues[par]);
         });
+
         supervisor.registerSpecification(spec
             ,DN
             ,{
@@ -269,6 +284,54 @@ function getNetworkDescription(netID){
     return getNetworkDetail(netID , "description");
 }
 /**
+ * Given a network name return the network ID, if any
+ * @param netName
+ */
+function getNetworkID(netName){
+    return __netNameIndex[netName];
+}
+/**
+ * Builds a Shortest Path Tree on the network graph
+ */
+function updateSPTree(){
+    if (!netGraph){
+        throw new Error("Error computing the SP Tree: Network Tree is null");
+        return false
+    }
+    //  Floyd-Warshall
+    SPTree = graphLib.alg.floydWarshall(netGraph);
+    info("SPT calculated ( Floyd-Warshall )");
+    return true;
+}
+
+/**
+ * Returns IPs to be checked (destinations) on the path from ftomNet to toNet.
+ * Uses the SPTree
+ */
+function ipPath(fromNet , toNet){
+    var ret = [];
+    if (!SPTree)
+        updateSPTree();
+    if (!SPTree[fromNet][toNet]){
+        showTitle("No path available from "+fromNet+" to " +toNet);
+        return ret;
+    }
+    // We do a backward path, from destination do source
+    var e2e = SPTree[fromNet][toNet];
+    var next = toNet;
+    console.log("---> "+next);
+    for (var step=0; step<e2e.distance || next == fromNet; step++){
+        // GW connecting next to the predecessor. The gw name is the label of the edge
+        var gwIP = gatewayIpOnNet(netGraph.edge(next , SPTree[fromNet][next].predecessor) , next);
+        if (gwIP){
+            ret.push(gwIP);
+        }
+        next = SPTree[fromNet][next].predecessor;
+    }
+    return ret;
+}
+
+/**
  * Given an IP returns the indexID for __subnetIndex of the subnet it belongs, null if not belonging to any of the known nets
  * @param ip
  */
@@ -281,6 +344,58 @@ function ipBelongsToNetId(IPadd){
         }
     });
     return ret;
+}
+/**
+ * Which IP from gwName is on netName?
+ */
+function gatewayIpOnNet(gwName , netName){
+    if (!gwName || !netName)
+        return null;
+    if (!netDef['gateways'][gwName]){
+        showTitle("Missing info about net gateway " + gwName);
+        return null;
+    }
+    for (var i=0 ; i<netDef['gateways'][gwName].IPs.length ; i++){
+        var curIP = netDef['gateways'][gwName].IPs[i];
+        // If the net IP belongs to is the same of netName, I,ve found my IP
+        if (ipBelongsToNetId(curIP) == getNetworkID(netName)){
+            return curIP;
+        }
+    };
+}
+
+/**
+ * Given a network definition looks for net that are leaf of other net (for example 192.168.1.1/32 is leaf of 192.168.123.0/24)
+ * Leaf are marked with feature isLeaf:netID
+ * This is a Greedy funcntion
+ * @param netDefinition
+ */
+function checkForLeafs(netDefinition){
+    var netNames = _.keys(netDefinition.networks);
+   for (var i=0 ; i<netNames.length ; i++){
+       for (var j=0 ; j<netNames.length ; j++){
+            if (i != j){
+               if (isLeafOf(netDefinition.networks[netNames[i]].subnet , netDefinition.networks[netNames[j]].subnet)){
+                   info("..."+netNames[i] +" is leaf of "+netNames[j]);
+                   netDefinition.networks[netNames[i]].leafOf = ip.cidr(netDefinition.networks[netNames[j]].subnet);
+               }
+            }
+       }
+   }
+}
+
+/**
+ * return true if checked is leaf of leafOf
+ * @param checked subnet to be checked
+ * @param leafOf subnet to be checked toward
+ */
+function isLeafOf(checked , leafOf){
+    var checkedInfo = ip.cidrSubnet(checked),
+        leafOfInfo = ip.cidrSubnet(leafOf);
+    if ((ip.toLong(checkedInfo.firstAddress) >= ip.toLong(leafOfInfo.firstAddress)) && (ip.toLong(checkedInfo.lastAddress) <= ip.toLong(leafOfInfo.lastAddress)) ){
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -295,6 +410,11 @@ function hasProbeType(netId , type){
     return _.intersection(__IndexProbesByType[type] , __IndexProbesByNet[netId]);
 }
 
+function networkName(netId){
+    if (!__subnetIndex[netId])
+        return null;
+    return(__subnetIndex[netId]);
+}
 
 function motd(){
     console.log();
