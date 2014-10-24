@@ -190,7 +190,6 @@ function doPathMeasures( fromNet , toNet ){
     //probesId.forEach(function(val , index){
     // Ramdomly select a probe from available ones
     var probe = __availableProbes[Math.floor(Math.random() * (probesId.length - 1) )];
-    console.log(probe.getContrsints())
     var spec = new mplane.Specification(probe);
     // Do we have a path?
     if (!SPTree[fromNet][toNet]){
@@ -202,7 +201,7 @@ function doPathMeasures( fromNet , toNet ){
         targetIps.forEach(function(curIP , index){
             spec.set_when("now + 1s");
             spec.setParameterValue("destination.ip4", curIP);
-            spec.setParameterValue("source.ip4", );
+            //spec.setParameterValue("source.ip4", );
             console.log(spec)
             supervisor.registerSpecification(
                 spec
