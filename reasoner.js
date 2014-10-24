@@ -146,6 +146,7 @@ getSupervisorCapabilityes(function(err, caps){
                 console.log("Probe source IP")
                  console.log(sourceParamenter)
                 var ipSourceNet = (new mplane.Constraints(sourceParamenter.getConstraints()['0'])).getParam();
+                console.log(ipSourceNet)
                 var netId = ipBelongsToNetId(ipSourceNet);
                 if (netId){
                     if (!__IndexProbesByNet[netId])
