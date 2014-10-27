@@ -185,6 +185,7 @@ getSupervisorCapabilityes(function(err, caps){
  * @param config
  */
 function scan(config){
+    showTitle("NETWORK FULL SCAN STARTED");
     setInterval(function(){
         _.each(_.keys(SPTree) , function(fromLan){
             _.each(_.keys(SPTree[fromLan]) , function(toLan){
@@ -225,6 +226,9 @@ function doPathMeasures( fromNet , toNet){
         return;
     }
 
+    if (specAlreadyRegistered(spec))
+        return;
+
     // Do we have a path?
     if (!SPTree[fromNet][toNet]){
         showTitle("No PATH available "+fromNet +"(" + fromNetID + ") -> "+toNet+"("+toNetID+")");
@@ -233,7 +237,6 @@ function doPathMeasures( fromNet , toNet){
         // Array of IPs to be used ad target for our measures
         var targetIps = ipPath(fromNet , toNet);
         targetIps.forEach(function(curIP , index) {
-
             var destParam = probe.getParameter("destination.ip4");
             // Check if the destination is accepted by the probe
             if ((destParam.isValid(curIP) && destParam.met_by(curIP, undefined))){
@@ -273,8 +276,7 @@ function doPathMeasures( fromNet , toNet){
                                 rec._specification = spec;
                                 rec.fromNet = fromNet;
                                 rec.toNet = toNet;
-                                if (!specAlreadyRegistered(spec));
-                                    __specification_receipts__.push(rec);
+                                __specification_receipts__.push(rec);
                             }
                         }
                     }
