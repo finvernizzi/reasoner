@@ -185,8 +185,8 @@ getSupervisorCapabilityes(function(err, caps){
  * @param config
  */
 function scan(config){
-    showTitle("NETWORK FULL SCAN STARTED");
     setInterval(function(){
+        showTitle("NETWORK FULL SCAN STARTED");
         _.each(_.keys(SPTree) , function(fromLan){
             _.each(_.keys(SPTree[fromLan]) , function(toLan){
                 if (fromLan != toLan){
@@ -437,8 +437,7 @@ function getSupervisorCapabilityes(callback){
 function specAlreadyRegistered(spec){
     // Is the psecificationa already active_
     __specification_receipts__.forEach(function(curSpec , index){
-        if (curSpec.getToken() == spec.getToken()){
-            //console.log("------- ALREADY REGISTERED!");
+        if ((curSpec.fromNet == spec.fromNet) && (curSpec.toNet == spec.toNet)){
             return true;
         }
     });
