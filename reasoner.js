@@ -6,7 +6,7 @@
  * We can also add nodes adding /32 as subnet.
  */
 
-var NETWORK_DEFINITION = "./demoNet.json";
+//var NETWORK_DEFINITION = "./demoNet.json";
 var REACHABILITY_CAPABILITY = "delay.twoway";
 var CONFIGFILE = "reasoner.json";
 var PARAM_PROBE_SOURCE = "source.ip4";
@@ -50,6 +50,7 @@ cli.parse({
     ca:['c' , 'Certificate file of the Certification Auth' , 'string' , configuration.ssl.ca],
     key:['k' , 'Key file of the client' , 'string' , configuration.ssl.key],
     cert:['t' , 'Certificate file of the client' , 'string' , configuration.ssl.cert],
+    netFile:['n' , 'Network definition file' , 'string' , configuration.main.networkDefinitionFile],
     user:['u' , 'Login as user' , 'string' , 'demo']
 });
 
@@ -74,12 +75,12 @@ var SPTree = null;
 // Pending specifications (reasoner receipts)
 var __specification_receipts__ = [];
 
-var netDef = network.importFromJson(NETWORK_DEFINITION);
+var netDef = network.importFromJson(cli.options.netFile);
 if (!netDef){
     console.error("Error reading from network definition file");
     process.exit();
 }
-info("Network definitions loaded\n");
+info("Network definitions loaded from "+cli.options.netFile+"\n");
 
 info("Checking for leafs ...");
 checkForLeafs(netDef);
