@@ -268,7 +268,8 @@ function doPathMeasures( fromNet , toNet){
                             rec._specification = spec;
                             rec.fromNet = fromNet;
                             rec.toNet = toNet;
-                            __specification_receipts__.push(rec);
+                            if (rec)
+                                __specification_receipts__.push(rec);
                         }
                     }
                 });
