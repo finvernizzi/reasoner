@@ -207,6 +207,8 @@ function scan(config){
 function doPathMeasures( fromNet , toNet){
     var fromNetID = getNetworkID(fromNet);
     var toNetID = getNetworkID(toNet);
+    if (!fromNetID || !toNetID)
+        return;
     var probesId = hasProbeType(fromNetID , REACHABILITY_CAPABILITY);
     // Are there any probes in the from net?
     if (probesId.length == 0){
@@ -305,7 +307,6 @@ function checkStatus(){
                         }
                     }else {
                         delete __specification_receipts__[index];
-                        console.log(__specification_receipts__)
                         //TODO: choose which analyzer has to be triggered from the resultType
                         analyzeDelay(mplane.from_dict(body) , {
                             fromNet:rec.fromNet,
