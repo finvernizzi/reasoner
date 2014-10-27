@@ -386,12 +386,9 @@ function analyzeDelay(result , config){
     var curStatus = getNetworkStatus(getNetworkID(config.toNet));
     //setNetworkDetail(getNetworkID(config.toNet) , "status" , NET_STATUS_UNKNOWN );
     var RTT = (result.get_result_column_values(REACHABILITY_CAPABILITY))[0];
-    console.log(RTT);
+    console.log(config.fromNet + " ->" + config.toNet +":" + RTT);
     if (RTT <= configuration.delayAnalyzer.rttThresoldGood){
         setNetworkDetail(getNetworkID(config.toNet) , "status" , NET_STATUS_OK );
-    }
-    if (RTT >= configuration.delayAnalyzer.rttThresoldGood){
-        setNetworkDetail(getNetworkID(config.toNet) , "status" , NET_STATUS_WARNING );
     }
     if ((RTT >= configuration.delayAnalyzer.rttThresoldGood) && (RTT <= configuration.delayAnalyzer.rttThresoldBad)){
         setNetworkDetail(getNetworkID(config.toNet) , "status" , NET_STATUS_WARNING );
