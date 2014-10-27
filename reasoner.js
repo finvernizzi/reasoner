@@ -401,7 +401,7 @@ function analyzeDelay(result , config){
     }
     if (!RTT)
         setNetworkDetail(getNetworkID(config.toNet) , "status" , NET_STATUS_UNKNOWN );
-    if (curStatus != getNetworkStatus(getNetworkID(config.toNet)))
+    //if (curStatus != getNetworkStatus(getNetworkID(config.toNet)))
         showTitle(getNetworkDescription(getNetworkID(config.toNet)) + " status: " + getNetworkStatus(getNetworkID(config.toNet)));
 }
 
