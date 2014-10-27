@@ -29,7 +29,15 @@
             nodes: result.nodes,
             edges: result.edges
         };
-        var options = {nodes: {shape:'circle'},stabilize: true};
+        var options = {
+            nodes: {
+                shape:'circle'
+            }
+            ,stabilize: true
+            ,edges: {
+                fontSize: 6
+            }
+        };
         var network = new vis.Network(container, data, options);
     });
 
