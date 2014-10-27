@@ -226,7 +226,7 @@ function doPathMeasures( fromNet , toNet){
         return;
     }
 
-    if (specAlreadyRegistered(spec))
+    if (specAlreadyRegistered(fromNet , toNet))
         return;
 
     // Do we have a path?
@@ -441,10 +441,10 @@ function getSupervisorCapabilityes(callback){
         });
 }
 
-function specAlreadyRegistered(spec){
+function specAlreadyRegistered(fromNet , toNet){
     // Is the psecificationa already active_
     __specification_receipts__.forEach(function(curSpec , index){
-        if ((curSpec.fromNet == spec.fromNet) && (curSpec.toNet == spec.toNet)){
+        if ((fromNet == spec.fromNet) && (toNet == spec.toNet)){
             return true;
         }
     });
