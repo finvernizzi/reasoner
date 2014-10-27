@@ -240,6 +240,7 @@ function doPathMeasures( fromNet , toNet){
                 spec.set_when("now + 1s");
                 spec.setParameterValue("destination.ip4", curIP);
                 spec.setParameterValue("source.ip4", probe.ipAddr);
+                // Very bad... for now it works
                 if (probe.has_parameter("number"))
                     spec.setParameterValue('number', "5");
                 supervisor.registerSpecification(
@@ -267,11 +268,13 @@ function doPathMeasures( fromNet , toNet){
                             cli.error("The returned message is not a valid Receipt");
                         } else {
                             // We keep local registry of all spec and relative receipts
-                            rec._specification = spec;
-                            rec.fromNet = fromNet;
-                            rec.toNet = toNet;
-                            if (rec)
-                                __specification_receipts__.push(rec);
+                            if (rec){
+                                rec._specification = spec;
+                                rec.fromNet = fromNet;
+                                rec.toNet = toNet;
+                                if (!specAlreadyRegistered(spec));
+                                    __specification_receipts__.push(rec);
+                            }
                         }
                     }
                 });
@@ -428,6 +431,18 @@ function getSupervisorCapabilityes(callback){
             }
         });
 }
+
+function specAlreadyRegistered(spec){
+    // Is the psecificationa already active_
+    __specification_receipts__.forEach(function(curSpec , index){
+        if (curSpec.getToken() == spec.getToken()){
+            console.log("------- ALREADY REGISTERED!");
+            return true;
+        }
+    });
+    return false;
+}
+
 /**
  * Given a netId (as stored in __subnetIndex, from ip.cidrSubnet(subnet)) returns a detail from netDef
  * @param netId
