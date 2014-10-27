@@ -22,7 +22,7 @@
 
 <script type="text/javascript">
     // Get the json
-    $.getJSON("http://localhost/network_status.json",function(result){
+    $.getJSON("/network_status.json",function(result){
         console.log(result)
         var container = document.getElementById('mynetwork');
         var data = {
