@@ -215,7 +215,7 @@ function doPathMeasures( fromNet , toNet){
          //info("No available probes to do measure from \'"+getNetworkDescription(fromNetID)+"\' to \'"+getNetworkDescription(toNetID)+"\'");
         return;
     }
-    info(+getNetworkDescription(fromNetID)+"\' -> \'"+getNetworkDescription(toNetID)+"\'");
+    //info(+getNetworkDescription(fromNetID)+"\' -> \'"+getNetworkDescription(toNetID)+"\'");
     // Randomly select a probe from available ones if no one is selected
     var probe = __availableProbes[Math.floor(Math.random() * (probesId.length - 1) )];
     try{
@@ -233,7 +233,7 @@ function doPathMeasures( fromNet , toNet){
         // Array of IPs to be used ad target for our measures
         var targetIps = ipPath(fromNet , toNet);
         targetIps.forEach(function(curIP , index) {
-            cli.info("... "+curIP);
+            cli.info("      -> "+curIP);
             var destParam = probe.getParameter("destination.ip4");
             // Check if the destination is accepted by the probe
             if ((destParam.isValid(curIP) && destParam.met_by(curIP, undefined))){
@@ -276,7 +276,7 @@ function doPathMeasures( fromNet , toNet){
                     }
                 });
             }else{
-                cli.info("... "+curIP + " not accepted");
+                cli.info("... "+curIP + " not accepted by probe");
             }
         });
     }
