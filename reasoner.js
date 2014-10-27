@@ -304,6 +304,7 @@ function checkStatus(){
                         }
                     }else {
                         delete __specification_receipts__[index];
+                        console.log(__specification_receipts_)
                         //TODO: choose which analyzer has to be triggered from the resultType
                         analyzeDelay(mplane.from_dict(body) , {
                             fromNet:rec.fromNet,
