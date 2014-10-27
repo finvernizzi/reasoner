@@ -245,7 +245,7 @@ function doPathMeasures( fromNet , toNet){
                 spec.setParameterValue("source.ip4", probe.ipAddr);
                 // Very bad... for now it works
                 if (probe.has_parameter("number"))
-                    spec.setParameterValue('number', "1");
+                    spec.setParameterValue('number', "5");
                 // We changed the params, so we should update the default token, or we will have a lot of specification with the same token!!!
                 spec.update_token();
                 supervisor.registerSpecification(
