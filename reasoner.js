@@ -292,6 +292,7 @@ function checkStatus(){
     setInterval(function(){
         info("-- Check network status");
         __specification_receipts__.forEach(function(rec,index){
+            info("-------- "+rec.fromNet+" -> "+rec.toNet)
             supervisor.showResults(new mplane.Redemption({receipt: rec}) , {
                     host:cli.options.supervisorHost,
                     port:cli.options.supervisorPort,
@@ -314,8 +315,7 @@ function checkStatus(){
                         analyzeDelay(mplane.from_dict(body) , {
                             fromNet:rec.fromNet,
                             toNet:rec.toNet
-                        })
-                        var result = mplane.from_dict(body);
+                        });
                     }
                 });
         });
