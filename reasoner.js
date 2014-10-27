@@ -83,7 +83,6 @@ info("Network definitions loaded\n");
 
 info("Checking for leafs ...");
 checkForLeafs(netDef);
-console.log();
 
 // Import networks/gateways to generate a graph representation
 var netGraph = new graphLib.Graph({ directed: true});
@@ -132,6 +131,8 @@ info("..."+netGraph.nodeCount()+" networks");
 info("..."+netGraph.edgeCount()+" links");
 updateSPTree();
 
+dumpNetStatus();
+
 // Gets available capabilities and update indexes
 getSupervisorCapabilityes(function(err, caps){
      // Update indexes
@@ -168,7 +169,8 @@ getSupervisorCapabilityes(function(err, caps){
     info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
     console.log("\n");
     checkStatus();
-    doPathMeasures('localhost' , 'internet');
+    scan();
+    //doPathMeasures('localhost' , 'internet');
 });
 
 
@@ -179,23 +181,43 @@ getSupervisorCapabilityes(function(err, caps){
 // UTILITY FUNCTIONS
 /********************************************************************************************************************/
 /**
+ * Scans the network
+ * Tries to scan from any net to any net
+ * @param config
+ */
+function scan(config){
+    _.each(_.keys(SPTree) , function(fromLan){
+        _.each(_.keys(SPTree[fromLan]) , function(toLan){
+            if (fromLan != toLan){
+                doPathMeasures(fromLan , toLan);
+            }
+        })
+    });
+}
+
+/**
  * Given 2 known networks names, if there is a probe in fromNet, checks reachability of toNet
  * Basically it requires a probe to do some measure(s) (REACHABILITY_CAPABILITY) from A to B, including all net on the PATH
  * IF fromNet has more that one probe available, one is choosen RANDOMLY
  * The target for measure is the far-est IP of the GW from the source
- *
- * We can define which probe to use with probeID or a random one will be chosen
  */
-function doPathMeasures( fromNet , toNet , probeID){
+function doPathMeasures( fromNet , toNet){
     var fromNetID = getNetworkID(fromNet);
     var toNetID = getNetworkID(toNet);
     var probesId = hasProbeType(fromNetID , REACHABILITY_CAPABILITY);
+    // Are there any probes in the from net?
     if (probesId.length == 0){
-         showTitle("No available probes to do measure from \'"+getNetworkDescription(fromNetID)+"\' to \'"+getNetworkDescription(toNetID)+"\'");
+         info("No available probes to do measure from \'"+getNetworkDescription(fromNetID)+"\' to \'"+getNetworkDescription(toNetID)+"\'");
+        return;
     }
-    // Ramdomly select a probe from available ones
-    var probe = __availableProbes[probeID || Math.floor(Math.random() * (probesId.length - 1) )];
-    var spec = new mplane.Specification(probe);
+    // Randomly select a probe from available ones if no one is selected
+    var probe = __availableProbes[Math.floor(Math.random() * (probesId.length - 1) )];
+    try{
+        var spec = new mplane.Specification(probe);
+    }catch(e){
+        cli.error("doPathMeasures: Error creating the specification");
+        return;
+    }
 
     // Do we have a path?
     if (!SPTree[fromNet][toNet]){
@@ -205,6 +227,7 @@ function doPathMeasures( fromNet , toNet , probeID){
         // Array of IPs to be used ad target for our measures
         var targetIps = ipPath(fromNet , toNet);
         targetIps.forEach(function(curIP , index) {
+            cli.info("... "+curIP);
             var destParam = probe.getParameter("destination.ip4");
             // Check if the destination is accepted by the probe
             if ((destParam.isValid(curIP) && destParam.met_by(curIP, undefined))){
@@ -246,7 +269,7 @@ function doPathMeasures( fromNet , toNet , probeID){
                     }
                 });
             }else{
-                cli.info(curIP + " not accepted");
+                cli.info("... "+curIP + " not accepted");
             }
         });
     }
@@ -257,7 +280,7 @@ function doPathMeasures( fromNet , toNet , probeID){
  */
 function checkStatus(){
     setInterval(function(){
-        info("-- Check status");
+        info("-- Check network status");
         __specification_receipts__.forEach(function(rec,index){
             delete __specification_receipts__[index];
             supervisor.showResults(new mplane.Redemption({receipt: rec}) , {
@@ -271,11 +294,9 @@ function checkStatus(){
                     if (err){
                         if (err.message == 403){
                             // Not available
-                            callback(new Error("Result not availbale yet"),null);//Wrong answer
                             return;
                         }else{
                             showTitle("Error:"+body);
-                            callback(new Error("Error from server"),null);//Wrong answer
                             return;
                         }
                     }else {
@@ -289,6 +310,57 @@ function checkStatus(){
                 });
         });
     }, configuration.main.results_check_period || 10000);
+}
+
+/**
+ * Periodically sumps on a json file the status of the network
+ * The format is ready for vis.js
+ */
+function dumpNetStatus(){
+    setInterval(function(){
+        info("-- Dumping network status to "+configuration.dumpeToFile.file);
+        var LENGTH_MAIN = 150;
+        var LENGTH_SUB = 50;
+        var netNodes = netGraph.nodes();
+        var netEdges = netGraph.edges();
+        var added = [];
+        var ret = {
+            nodes : [],
+            edges : []
+        }
+
+        netNodes.forEach(function(lan , index){
+            ret.nodes.push(
+                {id: lan
+                ,label: lan
+                ,color:'darkGray'
+                ,title:getNetworkDescription(getNetworkID(lan))
+                ,shape:"dot"
+                });
+        });
+        for (var i=0 ; i<netEdges.length ; i++){
+            var edge = netEdges[i];
+            // We add only an edge between 2 nodes since we do not distinguish up/down
+            if (_.indexOf(added, "from:"+edge.w+"to:"+edge.v ) == -1)
+                ret.edges.push(
+                    {from: edge.v
+                     ,to: edge.w
+                     ,length: LENGTH_MAIN
+                     ,color:'gray'
+                     ,label:netGraph.edge(edge.v , edge.w)
+                   });
+            added.push("from:"+edge.v+"to:"+edge.w)
+        };
+
+        fs.writeFile(configuration.dumpeToFile.file, JSON.stringify(ret), function(err) {
+            if(err) {
+                showTitle(err);
+            } else {
+                info("Network status dumped to file");
+            }
+        });
+
+    }, configuration.dumpeToFile.period || 10000);
 }
 
 /**
@@ -554,7 +626,7 @@ var pad = function (str, len , padChar) {
 
 // Utility function to show a title somehow formatted
 function showTitle(text){
-    console.log("\n\n"+pad("",text.length,"-"));
+    console.log(pad("",text.length,"-"));
     console.log(text);
-    console.log(pad("",text.length,"-")+"\n");
+    console.log(pad("",text.length,"-"));
 }
