@@ -12,9 +12,9 @@ var CONFIGFILE = "reasoner.json";
 var PARAM_PROBE_SOURCE = "source.ip4";
 var LEAF_GW = "__leaf__"; // ficticious gateway for labeling edges of LEAF nodes
 var NET_STATUS_UNKNOWN = "unknown";
-var NET_STATUS_OK = "ok";
-var NET_STATUS_WARNING = "warning";
-var NET_STATUS_NOK = "BAD";
+var NET_STATUS_OK = "green";
+var NET_STATUS_WARNING = "yellow";
+var NET_STATUS_NOK = "red";
 
 
 var network=require("./network.js")
@@ -207,9 +207,10 @@ function doPathMeasures( fromNet , toNet){
     var probesId = hasProbeType(fromNetID , REACHABILITY_CAPABILITY);
     // Are there any probes in the from net?
     if (probesId.length == 0){
-         info("No available probes to do measure from \'"+getNetworkDescription(fromNetID)+"\' to \'"+getNetworkDescription(toNetID)+"\'");
+         //info("No available probes to do measure from \'"+getNetworkDescription(fromNetID)+"\' to \'"+getNetworkDescription(toNetID)+"\'");
         return;
     }
+    info(+getNetworkDescription(fromNetID)+"\' -> \'"+getNetworkDescription(toNetID)+"\'");
     // Randomly select a probe from available ones if no one is selected
     var probe = __availableProbes[Math.floor(Math.random() * (probesId.length - 1) )];
     try{
@@ -282,7 +283,6 @@ function checkStatus(){
     setInterval(function(){
         info("-- Check network status");
         __specification_receipts__.forEach(function(rec,index){
-            delete __specification_receipts__[index];
             supervisor.showResults(new mplane.Redemption({receipt: rec}) , {
                     host:cli.options.supervisorHost,
                     port:cli.options.supervisorPort,
@@ -300,6 +300,7 @@ function checkStatus(){
                             return;
                         }
                     }else {
+                        delete __specification_receipts__[index];
                         //TODO: choose which analyzer has to be triggered from the resultType
                         analyzeDelay(mplane.from_dict(body) , {
                             fromNet:rec.fromNet,
@@ -333,7 +334,7 @@ function dumpNetStatus(){
             ret.nodes.push(
                 {id: lan
                 ,label: lan
-                ,color:'darkGray'
+                ,color: getNetworkDetail(getNetworkID(lan) , "status") || "gray"
                 ,title:getNetworkDescription(getNetworkID(lan))
                 ,shape:"dot"
                 });
