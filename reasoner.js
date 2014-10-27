@@ -168,9 +168,8 @@ getSupervisorCapabilityes(function(err, caps){
     });
     info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
     console.log("\n");
-    checkStatus();
     scan();
-    //doPathMeasures('localhost' , 'internet');
+    checkStatus();
 });
 
 
@@ -186,14 +185,18 @@ getSupervisorCapabilityes(function(err, caps){
  * @param config
  */
 function scan(config){
-    _.each(_.keys(SPTree) , function(fromLan){
-        _.each(_.keys(SPTree[fromLan]) , function(toLan){
-            if (fromLan != toLan){
-                doPathMeasures(fromLan , toLan);
-            }
-        })
-    });
+    setInterval(function(){
+        _.each(_.keys(SPTree) , function(fromLan){
+            _.each(_.keys(SPTree[fromLan]) , function(toLan){
+                if (fromLan != toLan){
+                    doPathMeasures(fromLan , toLan);
+                }
+            })
+        });
+    }
+    ,configuration.main.scan_period);
 }
+
 
 /**
  * Given 2 known networks names, if there is a probe in fromNet, checks reachability of toNet
