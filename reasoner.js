@@ -291,7 +291,6 @@ function doPathMeasures( fromNet , toNet){
 function checkStatus(){
     setInterval(function(){
         info("-- Check network status");
-        console.log(__specification_receipts__)
         __specification_receipts__.forEach(function(rec,index){
             supervisor.showResults(new mplane.Redemption({receipt: rec}) , {
                     host:cli.options.supervisorHost,
@@ -436,7 +435,7 @@ function specAlreadyRegistered(spec){
     // Is the psecificationa already active_
     __specification_receipts__.forEach(function(curSpec , index){
         if (curSpec.getToken() == spec.getToken()){
-            console.log("------- ALREADY REGISTERED!");
+            //console.log("------- ALREADY REGISTERED!");
             return true;
         }
     });
