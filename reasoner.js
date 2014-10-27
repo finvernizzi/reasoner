@@ -244,13 +244,11 @@ function doPathMeasures( fromNet , toNet){
                 spec.set_when("now + 1s");
                 spec.setParameterValue("destination.ip4", curIP);
                 spec.setParameterValue("source.ip4", probe.ipAddr);
-                spec.update_token();
-                console.log("*************************")
-                console.log(spec.get_token());
-                console.log("*************************")
                 // Very bad... for now it works
                 if (probe.has_parameter("number"))
                     spec.setParameterValue('number', "1");
+                // We changed the params, so we should update the default token, or we will have a lot of specification with the same token!!!
+                spec.update_token();
                 supervisor.registerSpecification(
                 spec
                 , probe.DN
