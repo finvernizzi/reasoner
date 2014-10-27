@@ -4,8 +4,8 @@
         "version":"1.0",
         "description": "mPlane REASONER",
         "prompt_separator":"#",
-        "results_check_period": 20000,
-        "scan_period": 5000,
+        "results_check_period": 10000,
+        "scan_period": 30000,
         "process_name": "mPlane Reasoner"
     },
     "dumpeToFile":{
