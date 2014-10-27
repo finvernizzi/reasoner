@@ -317,7 +317,6 @@ function checkStatus(){
                         }
                     }else {
                         var supResponse = mplane.from_dict(body);
-                        console.log(supResponse);
                         if (supResponse instanceof mplane.Result){
                             delete __specification_receipts__[index];
                             //TODO: choose which analyzer has to be triggered from the resultType
