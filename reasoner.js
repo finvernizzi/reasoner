@@ -432,6 +432,7 @@ function getSupervisorCapabilityes(callback){
 }
 
 function specAlreadyRegistered(spec){
+    return false;
     // Is the psecificationa already active_
     __specification_receipts__.forEach(function(curSpec , index){
         if (curSpec.getToken() == spec.getToken()){
