@@ -233,10 +233,11 @@ function doPathMeasures( fromNet , toNet){
         // Array of IPs to be used ad target for our measures
         var targetIps = ipPath(fromNet , toNet);
         targetIps.forEach(function(curIP , index) {
-            cli.info("      -> "+curIP);
+
             var destParam = probe.getParameter("destination.ip4");
             // Check if the destination is accepted by the probe
             if ((destParam.isValid(curIP) && destParam.met_by(curIP, undefined))){
+                cli.info("     TARGET: "+curIP);
                 spec.set_when("now + 1s");
                 spec.setParameterValue("destination.ip4", curIP);
                 spec.setParameterValue("source.ip4", probe.ipAddr);
