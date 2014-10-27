@@ -226,9 +226,6 @@ function doPathMeasures( fromNet , toNet){
         return;
     }
 
-    if (specAlreadyRegistered(fromNet , toNet))
-        return;
-
     // Do we have a path?
     if (!SPTree[fromNet][toNet]){
         showTitle("No PATH available "+fromNet +"(" + fromNetID + ") -> "+toNet+"("+toNetID+")");
@@ -237,6 +234,8 @@ function doPathMeasures( fromNet , toNet){
         // Array of IPs to be used ad target for our measures
         var targetIps = ipPath(fromNet , toNet);
         targetIps.forEach(function(curIP , index) {
+            if (specAlreadyRegistered(probe.ipAddr , curIP))
+                return;
             var destParam = probe.getParameter("destination.ip4");
             // Check if the destination is accepted by the probe
             if ((destParam.isValid(curIP) && destParam.met_by(curIP, undefined))){
@@ -278,6 +277,8 @@ function doPathMeasures( fromNet , toNet){
                                 rec._specification = spec;
                                 rec.fromNet = fromNet;
                                 rec.toNet = toNet;
+                                rec.destonationIP = curIP;
+                                rec.sourceIP = probe.ipAddrP;
                                 __specification_receipts__.push(rec);
                             }
                         }
@@ -441,10 +442,10 @@ function getSupervisorCapabilityes(callback){
         });
 }
 
-function specAlreadyRegistered(fromNet , toNet){
+function specAlreadyRegistered(sourceIP , destinationIP){
     // Is the psecificationa already active_
-    __specification_receipts__.forEach(function(curSpec , index){
-        if ((fromNet == spec.fromNet) && (toNet == spec.toNet)){
+    __specification_receipts__.forEach(function(rec , index){
+        if ((sourceIP == rec.sourceIP) && (destonationIP == rec.destonationIP)){
             return true;
         }
     });
