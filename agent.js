@@ -10,7 +10,7 @@
  *
  **********************/
 var LISTENPORT = 80;
-var STATIC_CONTENT_DIR = __dirname+"./www/";
+var STATIC_CONTENT_DIR = __dirname+"/www/";
 var LOG_FILE = __dirname + './log/agent.log'
 
 var BAD_REQUEST = 400;
