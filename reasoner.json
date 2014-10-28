@@ -10,7 +10,7 @@
         "networkDefinitionFile":"./demoNet.json"
     },
     "smartAutoMeasure":{
-      "numRetries":3
+      "numRetries":10
     },
     "dumpeToFile":{
       "period": 5000,
