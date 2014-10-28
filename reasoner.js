@@ -565,7 +565,7 @@ function gatewayIpOnNet(gwName , netName){
     console.log("---- " + gatewayIpOnNet)
     console.log(gwName)
     console.log(netName)
-    console.log("the parent is"+parentNetOfLeaf(netName))
+    console.log("the parent is"+parentNetOfLeaf(netName));
     if (!gwName || !netName)
         return null;
     if (!netDef['gateways'][gwName]){
