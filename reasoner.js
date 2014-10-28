@@ -534,13 +534,14 @@ function ipPath(fromNet , toNet){
     // We do a backward path, from destination do source
     var e2e = SPTree[fromNet][toNet];
     var next = toNet;
-    //for (var step=0; step<e2e.distance || next == fromNet; step++){
     for (var step=0; step<e2e.distance; step++){
-        var target = SPTree[fromNet][next].predecessor;
+        var gwIP;
         if (next != fromNet){
-            //var gwIP = gatewayIpOnNet(netGraph.edge(next , SPTree[fromNet][next].predecessor) , next);
-            var gwIP = gatewayIpOnNet(netGraph.edge(next , target) , next);
-
+            // If we have a leaf, use its IP directly
+            if (isLeaf(next))
+                gwIP = getNetworkSubnet(next);
+            else
+                gwIP = gatewayIpOnNet(netGraph.edge(next , target) , next);
             if (gwIP){
                 ret.push(network.extractIp(gwIP));
             }
@@ -690,7 +691,6 @@ function registerMeasure(fromNet , toNet , receiptId){
     }else{
         if (__registered_measures__[regID].numRetries < configuration.smartAutoMeasure.numRetries){
             __registered_measures__[regID].numRetries++;
-            console.log("RETIRES:"+__registered_measures__[regID].numRetries)
             return false;
         }else{
             // The registered measure is LOST!
