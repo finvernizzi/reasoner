@@ -632,6 +632,8 @@ function isLeafOf(checked , leafOf){
  * @param netName
  */
 function isLeaf(netName){
+    if (!netDef.networks[netName])
+        return false;
     if (netDef.networks[netName].leafOf){
         return true;
     }
