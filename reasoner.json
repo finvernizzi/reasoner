@@ -6,7 +6,8 @@
         "prompt_separator":"#",
         "results_check_period": 10000,
         "scan_period": 10000,
-        "process_name": "mPlane Reasoner"
+        "process_name": "mPlane Reasoner",
+        "networkDefinitionFile":"./demoNet.json"
     },
     "dumpeToFile":{
       "period": 5000,

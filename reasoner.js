@@ -6,12 +6,11 @@
  * We can also add nodes adding /32 as subnet.
  */
 
-//var NETWORK_DEFINITION = "./demoNet.json";
 var REACHABILITY_CAPABILITY = "delay.twoway";
 var CONFIGFILE = "reasoner.json";
 var PARAM_PROBE_SOURCE = "source.ip4";
 var LEAF_GW = "__leaf__"; // ficticious gateway for labeling edges of LEAF nodes
-var NET_STATUS_UNKNOWN = "unknown";
+var NET_STATUS_UNKNOWN = "gray";
 var NET_STATUS_OK = "green";
 var NET_STATUS_WARNING = "yellow";
 var NET_STATUS_NOK = "red";
@@ -334,7 +333,7 @@ function checkStatus(){
 }
 
 /**
- * Periodically sumps on a json file the status of the network
+ * Periodically dumps on a json file the status of the network
  * The format is ready for vis.js
  */
 function dumpNetStatus(){
@@ -351,16 +350,36 @@ function dumpNetStatus(){
         }
 
         netNodes.forEach(function(lan , index){
+            var radius = 20,
+                shape = "box",
+                mass = 2;
+            if (isLeaf(lan)){
+                radius = 10;
+                shape = "dot";
+                mass= 2;
+            }
+
             ret.nodes.push(
                 {id: lan
                 ,label: lan
                 ,color: getNetworkDetail(getNetworkID(lan) , "status") || "gray"
                 ,title:getNetworkDescription(getNetworkID(lan))
-                ,shape:"dot"
+                ,shape:shape
+                ,radius:radius
+                ,mass:mass
                 });
         });
         for (var i=0 ; i<netEdges.length ; i++){
             var edge = netEdges[i];
+
+            var label = netGraph.edge(edge.v , edge.w)
+                ,style = "line";
+
+            if (label === LEAF_GW){
+                label = "";
+                style = "dash-line"
+            }
+
             // We add only an edge between 2 nodes since we do not distinguish up/down
             if (_.indexOf(added, "from:"+edge.w+"to:"+edge.v ) == -1)
                 ret.edges.push(
@@ -368,7 +387,8 @@ function dumpNetStatus(){
                      ,to: edge.w
                      ,length: LENGTH_MAIN
                      ,color:'gray'
-                     ,label:netGraph.edge(edge.v , edge.w)
+                     ,label:label
+                     ,style:style
                    });
             added.push("from:"+edge.v+"to:"+edge.w)
         };
@@ -588,6 +608,16 @@ function isLeafOf(checked , leafOf){
     var checkedInfo = ip.cidrSubnet(checked),
         leafOfInfo = ip.cidrSubnet(leafOf);
     if ((ip.toLong(checkedInfo.firstAddress) >= ip.toLong(leafOfInfo.firstAddress)) && (ip.toLong(checkedInfo.lastAddress) <= ip.toLong(leafOfInfo.lastAddress)) ){
+        return true;
+    }
+    return false;
+}
+/**
+ * is the net a leaf?
+ * @param netName
+ */
+function isLeaf(netName){
+    if (netDef.networks[netName].leafOf){
         return true;
     }
     return false;

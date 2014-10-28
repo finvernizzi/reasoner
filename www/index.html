@@ -21,25 +21,67 @@
 <div id="mynetwork"></div>
 
 <script type="text/javascript">
+    var data = {}
+        ,network;
+
+    var nodes = new vis.DataSet();
+    var edges = new vis.DataSet();
+
+    /*nodes.add([
+        {id: '1', label: 'Node 1'},
+        {id: '2', label: 'Node 2'},
+        {id: '3', label: 'Node 3'},
+        {id: '4', label: 'Node 4'},
+        // ... more nodes
+    ]);*/
+
     // Get the json
     $.getJSON("/network_status.json",function(result){
-        console.log(result)
         var container = document.getElementById('mynetwork');
-        var data = {
-            nodes: result.nodes,
-            edges: result.edges
+        data = {
+            nodes: nodes
+            ,edges: edges
         };
         var options = {
             nodes: {
-                shape:'circle'
+                shape:"dot",
+                radius:20
             }
             ,stabilize: true
             ,edges: {
                 fontSize: 10
             }
         };
-        var network = new vis.Network(container, data, options);
+        result.nodes.forEach(function(n , i){
+            nodes.add(n)
+        });
+        result.edges.forEach(function(e , i){
+            edges.add(e)
+        });
+        network = new vis.Network(container, data, options);
+        network.on("stabilized" , function(){
+            network.storePosition();
+        })
     });
+    updateNetwork();
+
+function updateNetwork(){
+    window.setInterval(function(){
+        //network.storePosition();
+        $.getJSON("/network_status.json",function(result){
+            //nodes.clear();
+            //edges.clear();
+            result.nodes.forEach(function(n , i){
+                nodes.add(n)
+            });
+            result.edges.forEach(function(e , i){
+                edges.add(e)
+            });
+        });
+
+
+    }, 5000);
+}
 
 </script>
 
