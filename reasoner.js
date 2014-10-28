@@ -660,7 +660,9 @@ After num_retries of instantiating a measure and the slot is not free, the regis
 
 */
 
-
+function regID(fromNet , toNet){
+    return fromNet+toNet;
+}
 /**
  * Tries to register a measure. If no slot are available return false
   * @param fromNet NAME of the net
@@ -699,9 +701,7 @@ function registerReceipt(fromNet , toNet , receiptId){
     __registered_measures__[regID].receiptId = receiptId;
     return true;
 }
-function regID(fromNet , toNet){
-    return fromNet+toNet;
-}
+
 
 
 /****************************************************************************************************************/
