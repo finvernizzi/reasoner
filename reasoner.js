@@ -402,7 +402,7 @@ function dumpNetStatus(){
                         ,from: edge.v
                         ,to: edge.w
                          ,length: LENGTH_MAIN
-                         ,color:'gray'
+                         ,color:color
                          ,label:label
                          ,style:style
                    });
