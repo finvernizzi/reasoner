@@ -85,100 +85,21 @@ if (!netDef){
 }
 info("Network definitions loaded from "+cli.options.netFile+"\n");
 
+// Import networks/gateways to generate a graph representation
+var netGraph = new graphLib.Graph({ directed: true});
+
 info("Checking for leafs ...");
 checkForLeafs(netDef);
 
-// Import networks/gateways to generate a graph representation
-var netGraph = new graphLib.Graph({ directed: true});
-// Graph label
-netGraph.setGraph("mPlane DEMO NET");
-// Graph nodes
-_.each(netDef.networks , function(net , netName){
-    netGraph.setNode(netName , net.description);
-    if (net.subnet == network.UNSPECIFIED_NET){
-        __subnetIndex[network.UNSPECIFIED_NET] = netName; //INDEXED
-        __netNameIndex[netName] = network.UNSPECIFIED_NET;
-    }
-    else{
-        __subnetIndex[ip.cidr(net.subnet)] = netName; //INDEXED
-        __netNameIndex[netName] = ip.cidr(net.subnet);
-    }
+initNetGraph();
 
-});
-info("Subnet nodes edges created");
-// LEAFS edges!
- _.each(netDef.networks , function(net , netName){
-     if (net.leafOf){
-         netGraph.setEdge(netName, networkName(net.leafOf) , LEAF_GW);
-         netGraph.setEdge( networkName(net.leafOf) , netName , LEAF_GW);
-     }
- });
- info("Leaf nodes linked");
-
-// Graph edges from gateways
-// Edges are identified using subnets
-_.each(netDef.gateways , function(gw , gwName){
-    for (var i=0; i<gw.IPs.length ; i++){
-        for (var j=0; j<gw.IPs.length;j++){
-            if (i != j){
-                // Subnet is the id of the node
-                // We use the GW name as label of the edge for seamlessly retrive the connecting GW
-                netGraph.setEdge(networkName(ip.cidr(gw.IPs[i])) , networkName(ip.cidr(gw.IPs[j])) , gwName );
-                netGraph.setEdge( networkName(ip.cidr(gw.IPs[j])) , networkName(ip.cidr(gw.IPs[i])) ,gwName );
-            }
-        }
-    }
-});
-info("Edges created");
-info("Graph created");
-info("..."+netGraph.nodeCount()+" networks");
-info("..."+netGraph.edgeCount()+" links");
 updateSPTree();
 
 dumpNetStatus();
 
-// Gets available capabilities and update indexes
-getSupervisorCapabilityes(function(err, caps){
-     // Update indexes
-    _.each(caps, function(capsDN , DN){
-        capsDN.forEach(function(cap , index){
-            var capability = mplane.from_dict(cap);
-            if (!__availableProbes[DN])
-                __availableProbes[DN] = [];
-            capability.DN = DN;
-            // If source.ip4 param is not present we have no way to know where the probe is with respect of our net
-            if (_.indexOf(capability.getParameterNames() , PARAM_PROBE_SOURCE) === -1){
-                showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
-            }else{
-                var sourceParamenter = capability.getParameter(PARAM_PROBE_SOURCE);
-                var ipSourceNet = (new mplane.Constraints(sourceParamenter.getConstraints()['0'])).getParam();
-                capability.ipAddr= ipSourceNet;
-                // Add to the known capabilities
-                var index = (__availableProbes.push(capability))-1;
-                var netId = ipBelongsToNetId(ipSourceNet);
-                if (netId){
-                    if (!__IndexProbesByNet[netId])
-                        __IndexProbesByNet[netId] = [];
-                    __IndexProbesByNet[netId].push(index);
-                }
-                var capTypes = capability.result_column_names();
-                capTypes.forEach(function(type , i){
-                    if (!__IndexProbesByType[type])
-                        __IndexProbesByType[type] = [];
-                    __IndexProbesByType[type].push(index);
-                });
-            }
-        }); // caps of a DN
-    });
-    info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
-    console.log("\n");
-    // Periodically scan al lthe net
-    scan();
-    // Periodically check if results are ready
-    checkStatus();
-});
 
-
+// This find capabilities and then start scan and checkStatus
+getCapabilities();
 
 
 
@@ -204,6 +125,101 @@ function scan(config){
     ,configuration.main.scan_period);
 }
 
+/**
+ * Get capabilities from supervisor.
+ * Then start scan and checkStatus
+ */
+function getCapabilities(){
+// Gets available capabilities and update indexes
+    getSupervisorCapabilityes(function(err, caps){
+        // Update indexes
+        _.each(caps, function(capsDN , DN){
+            capsDN.forEach(function(cap , index){
+                var capability = mplane.from_dict(cap);
+                if (!__availableProbes[DN])
+                    __availableProbes[DN] = [];
+                capability.DN = DN;
+                // If source.ip4 param is not present we have no way to know where the probe is with respect of our net
+                if (_.indexOf(capability.getParameterNames() , PARAM_PROBE_SOURCE) === -1){
+                    showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
+                }else{
+                    var sourceParamenter = capability.getParameter(PARAM_PROBE_SOURCE);
+                    var ipSourceNet = (new mplane.Constraints(sourceParamenter.getConstraints()['0'])).getParam();
+                    capability.ipAddr= ipSourceNet;
+                    // Add to the known capabilities
+                    var index = (__availableProbes.push(capability))-1;
+                    var netId = ipBelongsToNetId(ipSourceNet);
+                    if (netId){
+                        if (!__IndexProbesByNet[netId])
+                            __IndexProbesByNet[netId] = [];
+                        __IndexProbesByNet[netId].push(index);
+                    }
+                    var capTypes = capability.result_column_names();
+                    capTypes.forEach(function(type , i){
+                        if (!__IndexProbesByType[type])
+                            __IndexProbesByType[type] = [];
+                        __IndexProbesByType[type].push(index);
+                    });
+                }
+            }); // caps of a DN
+        });
+        info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
+        console.log("\n");
+        // Periodically scan al lthe net
+        scan();
+        // Periodically check if results are ready
+        checkStatus();
+    });
+}
+
+/**
+ * Inititalizes the net Graph
+ */
+function initNetGraph(){
+// Graph label
+    netGraph.setGraph("mPlane DEMO NET");
+// Graph nodes
+    _.each(netDef.networks , function(net , netName){
+        netGraph.setNode(netName , net.description);
+        if (net.subnet == network.UNSPECIFIED_NET){
+            __subnetIndex[network.UNSPECIFIED_NET] = netName; //INDEXED
+            __netNameIndex[netName] = network.UNSPECIFIED_NET;
+        }
+        else{
+            __subnetIndex[ip.cidr(net.subnet)] = netName; //INDEXED
+            __netNameIndex[netName] = ip.cidr(net.subnet);
+        }
+
+    });
+    info("Subnet nodes edges created");
+// LEAFS edges!
+    _.each(netDef.networks , function(net , netName){
+        if (net.leafOf){
+            netGraph.setEdge(netName, networkName(net.leafOf) , LEAF_GW);
+            netGraph.setEdge( networkName(net.leafOf) , netName , LEAF_GW);
+        }
+    });
+    info("Leaf nodes linked");
+
+// Graph edges from gateways
+// Edges are identified using subnets
+    _.each(netDef.gateways , function(gw , gwName){
+        for (var i=0; i<gw.IPs.length ; i++){
+            for (var j=0; j<gw.IPs.length;j++){
+                if (i != j){
+                    // Subnet is the id of the node
+                    // We use the GW name as label of the edge for seamlessly retrive the connecting GW
+                    netGraph.setEdge(networkName(ip.cidr(gw.IPs[i])) , networkName(ip.cidr(gw.IPs[j])) , gwName );
+                    netGraph.setEdge( networkName(ip.cidr(gw.IPs[j])) , networkName(ip.cidr(gw.IPs[i])) ,gwName );
+                }
+            }
+        }
+    });
+    info("Edges created");
+    info("Graph created");
+    info("..."+netGraph.nodeCount()+" networks");
+    info("..."+netGraph.edgeCount()+" links");
+}
 
 /**
  * Given 2 known networks names, if there is a probe in fromNet, checks reachability of toNet
