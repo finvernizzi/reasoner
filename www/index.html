@@ -27,14 +27,6 @@
     var nodes = new vis.DataSet();
     var edges = new vis.DataSet();
 
-    /*nodes.add([
-        {id: '1', label: 'Node 1'},
-        {id: '2', label: 'Node 2'},
-        {id: '3', label: 'Node 3'},
-        {id: '4', label: 'Node 4'},
-        // ... more nodes
-    ]);*/
-
     // Get the json
     $.getJSON("/network_status.json",function(result){
         var container = document.getElementById('mynetwork');
@@ -67,10 +59,8 @@
 
 function updateNetwork(){
     window.setInterval(function(){
-        //network.storePosition();
+                console.log(nodes)
         $.getJSON("/network_status.json",function(result){
-            //nodes.clear();
-            //edges.clear();
             result.nodes.forEach(function(n , i){
                 nodes.add(n)
             });
@@ -78,9 +68,8 @@ function updateNetwork(){
                 edges.add(e)
             });
         });
-
-
-    }, 5000);
+    }
+    ,5000);
 }
 
 </script>
