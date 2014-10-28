@@ -677,6 +677,7 @@ function uniqueRegID(fromNet , toNet){
  * @param toNet NAME of the net
  */
 function registerMeasure(fromNet , toNet , receiptId){
+    console.log("registerMeasure:"+fromNet+" -> "+toNet);
     var regID = uniqueRegID(fromNet , toNet);
     if (!__registered_measures__[regID]){
         __registered_measures__[regID]={
@@ -685,10 +686,12 @@ function registerMeasure(fromNet , toNet , receiptId){
             numRetries : 0,
             receiptId : receiptId || null
         };
+        console.log("OK")
         return true;
     }else{
         if (__registered_measures__[regID].numRetries < configuration.smartAutoMeasure.numRetries){
             __registered_measures__[regID].numRetries++;
+            console.log("RETIRES:"+__registered_measures__[regID].numRetries)
             return false;
         }else{
             // The registered measure is LOST!
