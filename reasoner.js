@@ -352,6 +352,7 @@ function dumpNetStatus(){
         var netNodes = netGraph.nodes();
         var netEdges = netGraph.edges();
         var added = [];
+        var color = "gray";
         var ret = {
             nodes : [],
             edges : []
@@ -371,7 +372,7 @@ function dumpNetStatus(){
                 shape = "image";
                 image = getNetworkDetail(getNetworkID(lan) , "image");
             }
-
+             color = getNetworkDetail(getNetworkID(lan) , "status") || "gray";
             ret.nodes.push(
                 {id: lan
                 ,label: lan
@@ -402,7 +403,7 @@ function dumpNetStatus(){
                         ,from: edge.v
                         ,to: edge.w
                          ,length: LENGTH_MAIN
-                         ,color:getNetworkDetail(getNetworkID(lan) , "status") || "gray"
+                         ,color:color
                          ,label:label
                          ,style:style
                    });
