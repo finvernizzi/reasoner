@@ -536,6 +536,9 @@ function ipPath(fromNet , toNet){
     for (var step=0; step<e2e.distance || next == fromNet; step++){
         // GW connecting next to the predecessor. The gw name is the label of the edge
         var gwIP = gatewayIpOnNet(netGraph.edge(next , SPTree[fromNet][next].predecessor) , next);
+        if (gwIP == LEAF_GW){
+            gwIP = gatewayIpOnNet(netGraph.edge(next , SPTree[fromNet][next].predecessor)) , next);
+        }
         if (gwIP){
             ret.push(network.extractIp(gwIP));
         }
@@ -565,17 +568,12 @@ function gatewayIpOnNet(gwName , netName){
     console.log("---- " + gatewayIpOnNet)
     console.log(gwName)
     console.log(netName)
-    console.log("the parent is"+parentNetOfLeaf(netName));
+    console.log("the parent is"+__subnetIndex[parentNetIDOfLeaf(netName)]);
     if (!gwName || !netName)
         return null;
     if (!netDef['gateways'][gwName]){
-        // Leafs are special case
-        if (gwName == LEAF_GW){
-            networkName(net.leafOf)
-        }else{
-            showTitle("Missing info about net gateway " + gwName);
-            return null;
-        }
+        showTitle("Missing info about net gateway " + gwName);
+        return null;
     }
     for (var i=0 ; i<netDef['gateways'][gwName].IPs.length ; i++){
         var curIP = netDef['gateways'][gwName].IPs[i];
@@ -632,10 +630,10 @@ function isLeaf(netName){
 }
 
 /**
- * Given a netName, if it is a leaf, returns iots parent (the rel subnet)
+ * Given a netName, if it is a leaf, returns the parent net ID (the real subnet net ID)
  * @param netName
  */
-function parentNetOfLeaf(netName){
+function parentNetIDOfLeaf(netName){
     console.log(netDef);
     if (!isLeaf(netName)){
         showTitle("parentOfLeaf-- "+netName+" is not a leaf");
