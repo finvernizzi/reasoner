@@ -537,8 +537,8 @@ function ipPath(fromNet , toNet){
         // GW connecting next to the predecessor. The gw name is the label of the edge
         var gwIP = gatewayIpOnNet(netGraph.edge(next , SPTree[fromNet][next].predecessor) , next);
         if (gwIP == LEAF_GW){
-            console.log("---"+next);
-            console.log(parentNetIDOfLeaf(next));
+            console.log("---"+SPTree[fromNet][next].predecessor);
+            console.log(parentNetIDOfLeaf(SPTree[fromNet][next].predecessor));
             //gwIP = gatewayIpOnNet(parentNetIDOfLeaf()  netGraph.edge(next , SPTree[fromNet][next].predecessor) , next);
         }
         if (gwIP){
@@ -567,11 +567,7 @@ function ipBelongsToNetId(IPadd){
  * Which IP from gwName is on netName?
  */
 function gatewayIpOnNet(gwName , netName){
-    console.log("---- " + gatewayIpOnNet)
-    console.log(gwName)
-    console.log(netName)
-    console.log("the parent is"+__subnetIndex[parentNetIDOfLeaf(netName)]);
-    if (!gwName || !netName)
+    f (!gwName || !netName)
         return null;
     if (!netDef['gateways'][gwName]){
         showTitle("Missing info about net gateway " + gwName);
