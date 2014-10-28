@@ -565,7 +565,7 @@ function gatewayIpOnNet(gwName , netName){
     console.log("---- " + gatewayIpOnNet)
     console.log(gwName)
     console.log(netName)
-    console.log(SPTree)
+    console.log("the parent is"+parentNetOfLeaf(netName))
     if (!gwName || !netName)
         return null;
     if (!netDef['gateways'][gwName]){
@@ -585,6 +585,7 @@ function gatewayIpOnNet(gwName , netName){
         }
     };
 }
+
 
 /**
  * Given a network definition looks for net that are leaf of other net (for example 192.168.1.1/32 is leaf of 192.168.123.0/24)
@@ -628,6 +629,18 @@ function isLeaf(netName){
         return true;
     }
     return false;
+}
+
+/**
+ * Given a netName, if it is a leaf, returns iots parent (the rel subnet)
+ * @param netName
+ */
+function parentNetOfLeaf(netName){
+    if (!isLeaf(netName)){
+        showTitle("parentOfLeaf-- "+netName+" is not a leaf");
+        return false;
+    }else
+        return (netDefinition.networks[netName].leafOf);
 }
 
 /**
