@@ -325,7 +325,8 @@ function checkStatus(){
                     }else {
                         var supResponse = mplane.from_dict(body);
                         if (supResponse instanceof mplane.Result){
-                            delete __specification_receipts__[index];
+                            unRegisterMeasure(rec.fromNet, rec.toNet);
+                            //delete __specification_receipts__[index];
                             //TODO: choose which analyzer has to be triggered from the resultType
                             analyzeDelay(mplane.from_dict(body) , {
                                 fromNet:rec.fromNet,
@@ -696,8 +697,9 @@ function registerMeasure(fromNet , toNet , receiptId){
         }else{
             // The registered measure is LOST!
             showTitle("MEASURE LOST! "+fromNet+" -> "+toNet)
-            delete __specification_receipts__[__registered_measures__[regID].receiptId];
-            delete __registered_measures__[regID];
+            unRegisterMeasure(fromNet , toNet);
+            //delete __specification_receipts__[__registered_measures__[regID].receiptId];
+            //delete __registered_measures__[regID];
             return true; // We can add a new measure
         }
     }
@@ -710,6 +712,17 @@ function registerReceipt(fromNet , toNet , receiptId){
         return false;
     }
     __registered_measures__[regID].receiptId = receiptId;
+    return true;
+}
+function unRegisterMeasure(fromNet , toNet){
+    console.log("DELETE REGISTERED:"+fromNet+" -> "+toNet);
+    var regID = uniqueRegID(fromNet , toNet);
+    if (!__registered_measures__[regID]){
+        showTitle("The measure is not registered. "+fromNet+" -> "+toNet);
+        return false;
+    }
+    delete __specification_receipts__[__registered_measures__[regID].receiptId];
+    delete __registered_measures__[regID];
     return true;
 }
 
