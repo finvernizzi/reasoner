@@ -535,9 +535,9 @@ function ipPath(fromNet , toNet){
     var e2e = SPTree[fromNet][toNet];
     var next = toNet;
     for (var step=0; step<e2e.distance; step++){
-        var gwIP;
+        var target = SPTree[fromNet][next].predecessor,
+            gwIP;
         if (next != fromNet){
-            // If we have a leaf, use its IP directly
             if (isLeaf(next))
                 gwIP = getNetworkSubnet(next);
             else
