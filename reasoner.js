@@ -663,13 +663,14 @@ After num_retries of instantiating a measure and the slot is not free, the regis
 function regID(fromNet , toNet){
     return fromNet+toNet;
 }
+
 /**
  * Tries to register a measure. If no slot are available return false
   * @param fromNet NAME of the net
  * @param toNet NAME of the net
  */
 function registerMeasure(fromNet , toNet , receiptId){
-    var regID =regID(fromNet , toNet);
+    var regID = regID(fromNet , toNet);
     if (!__registered_measures__[regID]){
         __registered_measures__[regID]={
             fromNet: fromNet,
