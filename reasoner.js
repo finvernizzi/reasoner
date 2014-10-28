@@ -367,9 +367,9 @@ function dumpNetStatus(){
                 shape = "dot";
                 mass= 2;
             }
-            if (lan.shape == "image"){
+            if (getNetworkDetail(getNetworkID(lan) , "shape") == "image"){
                 shape = "image";
-                image = lan.image;
+                image = getNetworkDetail(getNetworkID(lan) , "image");
             }
 
             ret.nodes.push(
