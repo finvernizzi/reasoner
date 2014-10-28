@@ -8,6 +8,9 @@
         },
         "google-gw":{
             "IPs":["173.194.112.127/24" , "163.162.170.197/27"]
+        },
+        "mplane-gw":{
+            "IPs":["130.192.9.200/24" , "163.162.170.197/27"]
         }
     },
     "networks":{
@@ -53,6 +56,13 @@
             "gateways" : ["google-gw"],
             "shape": "image",
             "image": "./img/google.png"
+        },
+        "mplane":{
+            "description" : "mPlane site",
+            "subnet": "130.192.9.200/24",
+            "gateways" : ["mplane-gw"],
+            "shape": "image",
+            "image": "./img/mplane.png"
         }
     }
 }
