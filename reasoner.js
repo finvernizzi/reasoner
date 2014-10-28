@@ -536,7 +536,7 @@ function ipPath(fromNet , toNet){
     for (var step=0; step<e2e.distance || next == fromNet; step++){
         var target = SPTree[fromNet][next].predecessor
         // GW connecting next to the predecessor. The gw name is the label of the edge
-        if (target == LEAF_GW){
+        if (isLeaf(target)){
             console.log("---"+next);
             console.log(parentNetIDOfLeaf(next));
             target  = parentNetIDOfLeaf(next);
