@@ -567,7 +567,7 @@ function ipBelongsToNetId(IPadd){
  * Which IP from gwName is on netName?
  */
 function gatewayIpOnNet(gwName , netName){
-    f (!gwName || !netName)
+    if (!gwName || !netName)
         return null;
     if (!netDef['gateways'][gwName]){
         showTitle("Missing info about net gateway " + gwName);
