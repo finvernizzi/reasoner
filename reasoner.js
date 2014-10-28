@@ -533,20 +533,23 @@ function ipPath(fromNet , toNet){
     // We do a backward path, from destination do source
     var e2e = SPTree[fromNet][toNet];
     var next = toNet;
-    for (var step=0; step<e2e.distance || next == fromNet; step++){
+    //for (var step=0; step<e2e.distance || next == fromNet; step++){
+    for (var step=0; step<e2e.distance; step++){
         var target = SPTree[fromNet][next].predecessor
-        console.log("*********** from:"+fromNet+" to:"+next+" ---"+target)
-        // GW connecting next to the predecessor. The gw name is the label of the edge
-        if (isLeaf(target)){
-            console.log("---"+next);
-            console.log(parentNetIDOfLeaf(next));
-            target  = parentNetIDOfLeaf(next);
-        }
-        //var gwIP = gatewayIpOnNet(netGraph.edge(next , SPTree[fromNet][next].predecessor) , next);
-        var gwIP = gatewayIpOnNet(netGraph.edge(next , target) , next);
+        if (next != fromNet){
+            console.log("*********** from:"+fromNet+" to:"+next+" ---"+target)
+            // GW connecting next to the predecessor. The gw name is the label of the edge
+            if (isLeaf(target)){
+                console.log("---"+next);
+                console.log(parentNetIDOfLeaf(next));
+                target  = parentNetIDOfLeaf(next);
+            }
+            //var gwIP = gatewayIpOnNet(netGraph.edge(next , SPTree[fromNet][next].predecessor) , next);
+            var gwIP = gatewayIpOnNet(netGraph.edge(next , target) , next);
 
-        if (gwIP){
-            ret.push(network.extractIp(gwIP));
+            if (gwIP){
+                ret.push(network.extractIp(gwIP));
+            }
         }
         next = SPTree[fromNet][next].predecessor;
     }
