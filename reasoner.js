@@ -636,6 +636,7 @@ function isLeaf(netName){
  * @param netName
  */
 function parentNetOfLeaf(netName){
+    console.log(netDef);
     if (!isLeaf(netName)){
         showTitle("parentOfLeaf-- "+netName+" is not a leaf");
         return false;
