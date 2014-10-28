@@ -660,7 +660,7 @@ After num_retries of instantiating a measure and the slot is not free, the regis
 
 */
 
-function regID(fromNet , toNet){
+function uniqueRegID(fromNet , toNet){
     return fromNet+toNet;
 }
 
@@ -670,7 +670,7 @@ function regID(fromNet , toNet){
  * @param toNet NAME of the net
  */
 function registerMeasure(fromNet , toNet , receiptId){
-    var regID = regID(fromNet , toNet);
+    var regID = uniqueRegID(fromNet , toNet);
     if (!__registered_measures__[regID]){
         __registered_measures__[regID]={
             fromNet: fromNet,
@@ -694,7 +694,7 @@ function registerMeasure(fromNet , toNet , receiptId){
 }
 // We need the receipt to remove it in case we should declare a measure lost
 function registerReceipt(fromNet , toNet , receiptId){
-    var regID =regID(fromNet , toNet);
+    var regID =uniqueRegID(fromNet , toNet);
     if (!__registered_measures__[regID]){
         showTitle("Trying to register a receipt for a measure not REGISTERED! "+fromNet+" -> "+toNet);
         return false;
