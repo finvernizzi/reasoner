@@ -72,7 +72,7 @@ var __IndexProbesByType ={};
 var SPTree = null;
 
 // Pending specifications (reasoner receipts)
-var __specification_receipts__ = [];
+var __specification_receipts__ = {};
 // Measrue already required.
 // We can instantiate only 1 measure from one net to another
 // After wait times it cannot instyantiate a new measure, the measure is considered dead and removed
@@ -286,7 +286,8 @@ function doPathMeasures( fromNet , toNet){
                                 rec.toNet = toNet;
                                 rec.destonationIP = curIP;
                                 rec.sourceIP = probe.ipAddrP;
-                                registerReceipt(fromNet , toNet , (__specification_receipts__.push(rec) - 1));
+                                //registerReceipt(fromNet , toNet , (__specification_receipts__.push(rec) - 1));
+                                registerReceipt(fromNet , toNet , rec);
                             }
                         }
                     }
@@ -304,7 +305,9 @@ function doPathMeasures( fromNet , toNet){
 function checkStatus(){
     setInterval(function(){
         info("-- Check network status");
-        __specification_receipts__.forEach(function(rec,index){
+        //__specification_receipts__.forEach(function(rec,index){
+        _.each(_.keys(__specification_receipts__) , function(regID , index){
+            var rec = __specification_receipts__[regID];
             info("-------- "+rec.fromNet+" -> "+rec.toNet)
             supervisor.showResults(new mplane.Redemption({receipt: rec}) , {
                     host:cli.options.supervisorHost,
@@ -326,7 +329,6 @@ function checkStatus(){
                         var supResponse = mplane.from_dict(body);
                         if (supResponse instanceof mplane.Result){
                             unRegisterMeasure(rec.fromNet, rec.toNet);
-                            //delete __specification_receipts__[index];
                             //TODO: choose which analyzer has to be triggered from the resultType
                             analyzeDelay(mplane.from_dict(body) , {
                                 fromNet:rec.fromNet,
@@ -337,6 +339,8 @@ function checkStatus(){
                     }
                 });
         });
+
+        //)});
     }, configuration.main.results_check_period || 10000);
 }
 
@@ -625,6 +629,7 @@ function isLeafOf(checked , leafOf){
     var checkedInfo = ip.cidrSubnet(checked),
         leafOfInfo = ip.cidrSubnet(leafOf);
     if ((ip.toLong(checkedInfo.firstAddress) >= ip.toLong(leafOfInfo.firstAddress)) && (ip.toLong(checkedInfo.lastAddress) <= ip.toLong(leafOfInfo.lastAddress)) ){
+        console.log("---- "+checked+" leaf of "+leafOf)
         return true;
     }
     return false;
@@ -691,14 +696,13 @@ function uniqueRegID(fromNet , toNet){
   * @param fromNet NAME of the net
  * @param toNet NAME of the net
  */
-function registerMeasure(fromNet , toNet , receiptId){
+function registerMeasure(fromNet , toNet ){
     var regID = uniqueRegID(fromNet , toNet);
     if (!__registered_measures__[regID]){
         __registered_measures__[regID]={
             fromNet: fromNet,
             toNet:toNet,
-            numRetries : 0,
-            receiptId : receiptId || null
+            numRetries : 0
         };
         return true;
     }else{
@@ -714,13 +718,17 @@ function registerMeasure(fromNet , toNet , receiptId){
     }
 }
 // We need the receipt to remove it in case we should declare a measure lost
-function registerReceipt(fromNet , toNet , receiptId){
+function registerReceipt(fromNet , toNet , receipt){
+    if (!(receipt instanceof mplane.Receipt)){
+        showTitle("registerReceipt ERROR: the provided object is not a valid receipt");
+        return false;
+    }
     var regID =uniqueRegID(fromNet , toNet);
     if (!__registered_measures__[regID]){
         showTitle("Trying to register a receipt for a measure not REGISTERED! "+fromNet+" -> "+toNet);
         return false;
     }
-    __registered_measures__[regID].receiptId = receiptId;
+    __specification_receipts__[regID] = receipt;
     return true;
 }
 function unRegisterMeasure(fromNet , toNet){
@@ -729,11 +737,13 @@ function unRegisterMeasure(fromNet , toNet){
         showTitle("The measure is not registered. "+fromNet+" -> "+toNet);
         return false;
     }
-    delete __specification_receipts__[__registered_measures__[regID].receiptId];
+    delete __specification_receipts__[regID];
     delete __registered_measures__[regID];
     return true;
 }
 
+
+/****************************************************************************************************************/
 
 
 /****************************************************************************************************************/

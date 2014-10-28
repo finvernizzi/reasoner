@@ -10,7 +10,7 @@
             "IPs":["173.194.112.127/24" , "163.162.170.197/27"]
         },
         "mplane-gw":{
-            "IPs":["130.192.9.200/24" , "163.162.170.197/27"]
+            "IPs":["130.192.9.1/24" , "163.162.170.197/27"]
         }
     },
     "networks":{
@@ -28,7 +28,9 @@
         "internet":{
             "description" : "Internet",
             "subnet": "163.162.170.197/27",
-            "gateways" : ["internet-gw"]
+            "gateways" : ["internet-gw"],
+            "shape": "image",
+            "image": "./img/internet.png"
         },
         "userAccess":{
             "description" : "User access LAN",
@@ -50,12 +52,24 @@
             "subnet": "192.168.123.68/32",
             "gateways" : ["soekris-gw"]
         },
+        "google_net":{
+            "description" : "Google Network",
+            "subnet": "173.194.112.1/24",
+            "gateways" : ["google-gw"],
+            "shape": "image",
+            "image": "./img/google.png"
+        },
         "google":{
             "description" : "Google Network",
             "subnet": "173.194.112.127/32",
             "gateways" : ["google-gw"],
             "shape": "image",
             "image": "./img/google.png"
+        },
+        "polito":{
+            "description" : "mPlane site",
+            "subnet": "130.192.9.1/24",
+            "gateways" : ["mplane-gw"]
         },
         "mplane":{
             "description" : "mPlane site",
