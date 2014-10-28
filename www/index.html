@@ -59,14 +59,19 @@
 
 function updateNetwork(){
     window.setInterval(function(){
-                console.log(nodes)
         $.getJSON("/network_status.json",function(result){
             result.nodes.forEach(function(n , i){
-                nodes.add(n)
+                if (nodes.get(n.id).length == 0){
+                    console.log("add!")
+                    nodes.add(n)
+                }
+
             });
+            /*
             result.edges.forEach(function(e , i){
                 edges.add(e)
             });
+            */
         });
     }
     ,5000);
