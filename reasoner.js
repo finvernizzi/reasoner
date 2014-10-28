@@ -376,6 +376,7 @@ function dumpNetStatus(){
                 {id: lan
                 ,label: lan
                 ,color: getNetworkDetail(getNetworkID(lan) , "status") || "gray"
+                ,"color.border": getNetworkDetail(getNetworkID(lan) , "status") || "gray"
                 ,title:getNetworkDescription(getNetworkID(lan))
                 ,shape:shape
                 ,radius:radius
