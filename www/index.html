@@ -17,17 +17,15 @@
 </head>
 
 <body>
-
 <div id="mynetwork"></div>
 
 <script type="text/javascript">
     var data = {}
-        ,network;
+        ,network
+        ,nodes = new vis.DataSet()
+        ,edges = new vis.DataSet();
 
-    var nodes = new vis.DataSet();
-    var edges = new vis.DataSet();
-
-    // Get the json
+    // Get the json description
     $.getJSON("/network_status.json",function(result){
         var container = document.getElementById('mynetwork');
         data = {
@@ -62,19 +60,6 @@ function updateNetwork(){
         $.getJSON("/network_status.json",function(result){
             nodes.update(result.nodes)
             edges.update(result.edges)
-            /*
-            result.nodes.forEach(function(n , i){
-                if (!nodes.get(n.id)){
-                    nodes.add(n)
-                }
-
-            });
-            result.edges.forEach(function(e , i){
-                if (!edges.get(e.id)){
-                    edges.add(e)
-                }
-            });
-*/
         });
     }
     ,5000);
