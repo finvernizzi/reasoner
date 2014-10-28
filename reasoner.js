@@ -383,12 +383,14 @@ function dumpNetStatus(){
             // We add only an edge between 2 nodes since we do not distinguish up/down
             if (_.indexOf(added, "from:"+edge.w+"to:"+edge.v ) == -1)
                 ret.edges.push(
-                    {from: edge.v
-                     ,to: edge.w
-                     ,length: LENGTH_MAIN
-                     ,color:'gray'
-                     ,label:label
-                     ,style:style
+                    {
+                        id: edge.v+edge.w
+                        ,from: edge.v
+                        ,to: edge.w
+                         ,length: LENGTH_MAIN
+                         ,color:'gray'
+                         ,label:label
+                         ,style:style
                    });
             added.push("from:"+edge.v+"to:"+edge.w)
         };
