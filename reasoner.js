@@ -172,7 +172,9 @@ getSupervisorCapabilityes(function(err, caps){
     });
     info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
     console.log("\n");
+    // Periodically scan al lthe net
     scan();
+    // Periodically check if results are ready
     checkStatus();
 });
 
@@ -468,20 +470,6 @@ function getSupervisorCapabilityes(callback){
         });
 }
 
-///
-// FIXME: DEPRECATED!!!
-/*
-function specAlreadyRegistered(sourceIP , destinationIP){
-    // Is the psecificationa already active_
-    __specification_receipts__.forEach(function(rec , index){
-        if ((sourceIP == rec.sourceIP) && (destonationIP == rec.destonationIP)){
-            return true;
-        }
-    });
-    return false;
-}
-*/
-
 /**
  * Given a netId (as stored in __subnetIndex, from ip.cidrSubnet(subnet)) returns a detail from netDef
  * @param netId
@@ -548,6 +536,9 @@ function ipPath(fromNet , toNet){
     for (var step=0; step<e2e.distance || next == fromNet; step++){
         // GW connecting next to the predecessor. The gw name is the label of the edge
         var gwIP = gatewayIpOnNet(netGraph.edge(next , SPTree[fromNet][next].predecessor) , next);
+        if (gwIP == LEAF_GW){
+            var gwIP = gatewayIpOnNet(netGraph.edge(next , SPTree(SPTree[fromNet][next].predecessor).predecessor) , next);
+        }
         if (gwIP){
             ret.push(network.extractIp(gwIP));
         }
@@ -577,8 +568,13 @@ function gatewayIpOnNet(gwName , netName){
     if (!gwName || !netName)
         return null;
     if (!netDef['gateways'][gwName]){
-        showTitle("Missing info about net gateway " + gwName);
-        return null;
+        // Leafs are special case
+        if (gwName == LEAF_GW){
+            networkName(net.leafOf)
+        }else{
+            showTitle("Missing info about net gateway " + gwName);
+            return null;
+        }
     }
     for (var i=0 ; i<netDef['gateways'][gwName].IPs.length ; i++){
         var curIP = netDef['gateways'][gwName].IPs[i];
