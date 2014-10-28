@@ -360,11 +360,16 @@ function dumpNetStatus(){
         netNodes.forEach(function(lan , index){
             var radius = 20,
                 shape = "box",
-                mass = 2;
+                mass = 2,
+                image = "";
             if (isLeaf(lan)){
                 radius = 10;
                 shape = "dot";
                 mass= 2;
+            }
+            if (lan.shape == "image"){
+                shape = "image";
+                image = lan.image;
             }
 
             ret.nodes.push(
@@ -375,6 +380,7 @@ function dumpNetStatus(){
                 ,shape:shape
                 ,radius:radius
                 ,mass:mass
+                ,image:image
                 });
         });
         for (var i=0 ; i<netEdges.length ; i++){

@@ -5,6 +5,9 @@
         },
         "internet-gw":{
             "IPs":["192.168.123.129/30" , "163.162.170.197/27"]
+        },
+        "google-gw":{
+            "IPs":["173.194.112.127/24" , "163.162.170.197/27"]
         }
     },
     "networks":{
@@ -43,6 +46,13 @@
             "description" : "DHCP User 68",
             "subnet": "192.168.123.68/32",
             "gateways" : ["soekris-gw"]
+        },
+        "google":{
+            "description" : "Google Network",
+            "subnet": "173.194.112.127/24",
+            "gateways" : ["google-gw"],
+            "shape": "image",
+            "image": "./img/google.png"
         }
     }
 }
