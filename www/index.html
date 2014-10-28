@@ -60,18 +60,21 @@
 function updateNetwork(){
     window.setInterval(function(){
         $.getJSON("/network_status.json",function(result){
+            nodes.update(result.nodes)
+            edges.update(result.edges)
+            /*
             result.nodes.forEach(function(n , i){
                 if (!nodes.get(n.id)){
-                    console.log("add!")
                     nodes.add(n)
                 }
 
             });
-            /*
             result.edges.forEach(function(e , i){
-                edges.add(e)
+                if (!edges.get(e.id)){
+                    edges.add(e)
+                }
             });
-            */
+*/
         });
     }
     ,5000);
