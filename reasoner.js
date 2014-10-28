@@ -73,6 +73,10 @@ var SPTree = null;
 
 // Pending specifications (reasoner receipts)
 var __specification_receipts__ = [];
+// Measrue already required.
+// We can instantiate only 1 measure from one net to another
+// After wait times it cannot instyantiate a new measure, the measure is considered dead and removed
+var __registered_measures__ = {};
 
 var netDef = network.importFromJson(cli.options.netFile);
 if (!netDef){
@@ -234,7 +238,8 @@ function doPathMeasures( fromNet , toNet){
         // Array of IPs to be used ad target for our measures
         var targetIps = ipPath(fromNet , toNet);
         targetIps.forEach(function(curIP , index) {
-            if (specAlreadyRegistered(probe.ipAddr , curIP))
+            // Can we register a measure from the nets?
+            if (!registerMeasure(fromNet , toNet))
                 return;
             var destParam = probe.getParameter("destination.ip4");
             // Check if the destination is accepted by the probe
@@ -279,7 +284,7 @@ function doPathMeasures( fromNet , toNet){
                                 rec.toNet = toNet;
                                 rec.destonationIP = curIP;
                                 rec.sourceIP = probe.ipAddrP;
-                                __specification_receipts__.push(rec);
+                                registerReceipt(fromNet , toNet , (__specification_receipts__.push(rec) - 1));
                             }
                         }
                     }
@@ -463,6 +468,9 @@ function getSupervisorCapabilityes(callback){
         });
 }
 
+///
+// FIXME: DEPRECATED!!!
+/*
 function specAlreadyRegistered(sourceIP , destinationIP){
     // Is the psecificationa already active_
     __specification_receipts__.forEach(function(rec , index){
@@ -472,6 +480,7 @@ function specAlreadyRegistered(sourceIP , destinationIP){
     });
     return false;
 }
+*/
 
 /**
  * Given a netId (as stored in __subnetIndex, from ip.cidrSubnet(subnet)) returns a detail from netDef
@@ -641,6 +650,61 @@ function networkName(netId){
         return null;
     return(__subnetIndex[netId]);
 }
+
+
+/****************************************************************************************************************/
+/*          smart Auto Measure
+
+In order to avoid to many measure instantiated, we have only a measure we can instantiate from 2 networks
+After num_retries of instantiating a measure and the slot is not free, the registered measure is considered dead and removed
+
+*/
+
+
+/**
+ * Tries to register a measure. If no slot are available return false
+  * @param fromNet NAME of the net
+ * @param toNet NAME of the net
+ */
+function registerMeasure(fromNet , toNet , receiptId){
+    var regID =regID(fromNet , toNet);
+    if (!__registered_measures__[regID]){
+        __registered_measures__[regID]={
+            fromNet: fromNet,
+            toNet:toNet,
+            numRetries : 0,
+            receiptId : receiptId || null
+        };
+        return true;
+    }else{
+        if (__registered_measures__[regID].numRetries < configuration.smartAutoMeasure.numRetries){
+            __registered_measures__[regID].numRetries++;
+            return false;
+        }else{
+            // The registered measure is LOST!
+            showTitle("MEASURE LOST! "+fromNet+" -> "+toNet)
+            delete __specification_receipts__[__registered_measures__[regID].receiptId];
+            delete __registered_measures__[regID];
+            return true; // We can add a new measure
+        }
+    }
+}
+// We need the receipt to remove it in case we should declare a measure lost
+function registerReceipt(fromNet , toNet , receiptId){
+    var regID =regID(fromNet , toNet);
+    if (!__registered_measures__[regID]){
+        showTitle("Trying to register a receipt for a measure not REGISTERED! "+fromNet+" -> "+toNet);
+        return false;
+    }
+    __registered_measures__[regID].receiptId = receiptId;
+    return true;
+}
+function regID(fromNet , toNet){
+    return fromNet+toNet;
+}
+
+
+/****************************************************************************************************************/
 
 function motd(){
     console.log();

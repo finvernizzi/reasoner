@@ -9,6 +9,9 @@
         "process_name": "mPlane Reasoner",
         "networkDefinitionFile":"./demoNet.json"
     },
+    "smartAutoMeasure":{
+      "numRetries":3
+    },
     "dumpeToFile":{
       "period": 5000,
       "file": "./www/network_status.json"
