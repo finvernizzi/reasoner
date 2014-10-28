@@ -537,7 +537,7 @@ function ipPath(fromNet , toNet){
         // GW connecting next to the predecessor. The gw name is the label of the edge
         var gwIP = gatewayIpOnNet(netGraph.edge(next , SPTree[fromNet][next].predecessor) , next);
         if (gwIP == LEAF_GW){
-            var gwIP = gatewayIpOnNet(netGraph.edge(next , SPTree(SPTree[fromNet][next].predecessor).predecessor) , next);
+            var gwIP = gatewayIpOnNet(netGraph.edge(SPTree[fromNet][next].predecessor , SPTree(SPTree[fromNet][next].predecessor).predecessor) , next);
         }
         if (gwIP){
             ret.push(network.extractIp(gwIP));
