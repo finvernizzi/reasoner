@@ -11,9 +11,6 @@
         },
         "mplane-gw":{
             "IPs":["130.192.9.200/24" , "163.162.170.197/27"]
-        },
-        "TI-gw":{
-            "IPs":["163.162.170.129/26" , "163.162.170.197/27"]
         }
     },
     "networks":{
@@ -66,13 +63,6 @@
             "gateways" : ["mplane-gw"],
             "shape": "image",
             "image": "./img/mplane.png"
-        },
-        "TI":{
-            "description" : "Telecom Italia",
-            "subnet": "163.162.170.129/32",
-            "gateways" : ["TI-gw"],
-            "shape": "image",
-            "image": "./img/TI.png"
         }
     }
 }
