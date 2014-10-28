@@ -402,7 +402,7 @@ function dumpNetStatus(){
                         ,from: edge.v
                         ,to: edge.w
                          ,length: LENGTH_MAIN
-                         ,color:color
+                         ,color:getNetworkDetail(getNetworkID(lan) , "status") || "gray"
                          ,label:label
                          ,style:style
                    });
