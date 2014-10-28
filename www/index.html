@@ -61,7 +61,7 @@ function updateNetwork(){
     window.setInterval(function(){
         $.getJSON("/network_status.json",function(result){
             result.nodes.forEach(function(n , i){
-                if (nodes.get(n.id).length == 0){
+                if (!nodes.get(n.id)){
                     console.log("add!")
                     nodes.add(n)
                 }
