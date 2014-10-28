@@ -565,7 +565,7 @@ function gatewayIpOnNet(gwName , netName){
     console.log("---- " + gatewayIpOnNet)
     console.log(gwName)
     console.log(netName)
-    console.log(SPTree[netName][next].predecessor)
+    console.log(SPTree)
     if (!gwName || !netName)
         return null;
     if (!netDef['gateways'][gwName]){
