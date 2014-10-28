@@ -539,12 +539,14 @@ function ipPath(fromNet , toNet){
             gwIP;
         if (next != fromNet){
             if (isLeaf(next))
-                gwIP = getNetworkSubnet(next);
-            else
+                ret.push(getNetworkSubnet(next));
+            else{
                 gwIP = gatewayIpOnNet(netGraph.edge(next , target) , next);
-            if (gwIP){
-                ret.push(network.extractIp(gwIP));
+                if (gwIP){
+                    ret.push(network.extractIp(gwIP));
+                }
             }
+
         }
         next = SPTree[fromNet][next].predecessor;
     }
