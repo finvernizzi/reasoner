@@ -385,6 +385,7 @@ function dumpNetStatus(){
                 ,image:image
                 });
         });
+
         for (var i=0 ; i<netEdges.length ; i++){
             var edge = netEdges[i];
 
