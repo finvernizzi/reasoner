@@ -534,13 +534,16 @@ function ipPath(fromNet , toNet){
     var e2e = SPTree[fromNet][toNet];
     var next = toNet;
     for (var step=0; step<e2e.distance || next == fromNet; step++){
+        var target = SPTree[fromNet][next].predecessor
         // GW connecting next to the predecessor. The gw name is the label of the edge
-        var gwIP = gatewayIpOnNet(netGraph.edge(next , SPTree[fromNet][next].predecessor) , next);
-        if (gwIP == LEAF_GW){
+        if (target == LEAF_GW){
             console.log("---"+next);
             console.log(parentNetIDOfLeaf(next));
-            //gwIP = gatewayIpOnNet(parentNetIDOfLeaf()  netGraph.edge(next , SPTree[fromNet][next].predecessor) , next);
+            target  = parentNetIDOfLeaf(next);
         }
+        //var gwIP = gatewayIpOnNet(netGraph.edge(next , SPTree[fromNet][next].predecessor) , next);
+        var gwIP = gatewayIpOnNet(netGraph.edge(next , target) , next);
+
         if (gwIP){
             ret.push(network.extractIp(gwIP));
         }
