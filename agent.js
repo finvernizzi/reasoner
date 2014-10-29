@@ -25,8 +25,8 @@ var app = expresss();
 
 /***************************/
 // DEVELOPMENT - PRODUZIONE
-app.set('env' , "development");
-//app.set('env' , "production");
+//app.set('env' , "development");
+app.set('env' , "production");
 /***************************/
 
 app.set("name" , "Network Status Agent");
