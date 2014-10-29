@@ -11,7 +11,7 @@
  **********************/
 var LISTENPORT = 8081;
 var STATIC_CONTENT_DIR = __dirname+"/www/";
-var LOG_FILE = __dirname + './log/agent.log'
+var LOG_FILE = __dirname + '/var/log/mplane/agent.log'
 
 var BAD_REQUEST = 400;
 
