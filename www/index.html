@@ -51,9 +51,9 @@
         network = new vis.Network(container, data, options);
         network.on("stabilized" , function(){
             network.storePosition();
-        })
+        });
     });
-    //updateNetwork();
+    updateNetwork();
 
 function updateNetwork(){
     window.setInterval(function(){
