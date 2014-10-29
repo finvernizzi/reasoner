@@ -741,7 +741,7 @@ function registerReceipt(fromNet , toNet , receipt){
     }
     var regID =uniqueRegID(fromNet , toNet);
     if (!__registered_measures__[regID]){
-        showTitle("Trying to register a receipt for a measure not REGISTERED! "+fromNet+" -> "+toNet);
+        //showTitle("Trying to register a receipt for a measure not REGISTERED! "+fromNet+" -> "+toNet);
         return false;
     }
     __specification_receipts__[regID] = receipt;
