@@ -145,7 +145,7 @@ function getCapabilities(){
                 if (_.indexOf(capability.getParameterNames() , PARAM_PROBE_SOURCE) === -1){
                     showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
                 }else{
-                    descriptions.push(capability.get_label() + " __ "+ capability.get_metadata_value('System_type')  +" __ "+ capability.get_metadata_value('System_ID') +" __ "+ capability.get_verb());
+                    descriptions.push(capability.get_label() + result.result_column_names().join(" , "));
                     var sourceParamenter = capability.getParameter(PARAM_PROBE_SOURCE);
                     var ipSourceNet = (new mplane.Constraints(sourceParamenter.getConstraints()['0'])).getParam();
                     capability.ipAddr= ipSourceNet;
