@@ -132,6 +132,8 @@ function scan(config){
 function getCapabilities(){
 // Gets available capabilities and update indexes
     getSupervisorCapabilityes(function(err, caps){
+        // Just for the ready message
+        var descriptions = "";
         // Update indexes
         _.each(caps, function(capsDN , DN){
             capsDN.forEach(function(cap , index){
@@ -143,6 +145,7 @@ function getCapabilities(){
                 if (_.indexOf(capability.getParameterNames() , PARAM_PROBE_SOURCE) === -1){
                     showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
                 }else{
+                    descriptions += capability.get_label() || "" +" __ "+ capability.get_metadata_value('System_type') || "" +" __ "+ capability.get_metadata_value('System_ID') || "" +" __ "+ capability.get_verb() +"\n"
                     var sourceParamenter = capability.getParameter(PARAM_PROBE_SOURCE);
                     var ipSourceNet = (new mplane.Constraints(sourceParamenter.getConstraints()['0'])).getParam();
                     capability.ipAddr= ipSourceNet;
@@ -164,6 +167,7 @@ function getCapabilities(){
             }); // caps of a DN
         });
         info(__availableProbes.length+" capabilities discovered on "+cli.options.supervisorHost);
+        console.log(descriptions);
         console.log("\n");
         // Periodically scan al lthe net
         scan();
