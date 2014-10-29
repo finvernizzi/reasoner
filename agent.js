@@ -9,7 +9,7 @@
  *  SETTINGS e CONSTANTS
  *
  **********************/
-var LISTENPORT = 80;
+var LISTENPORT = 8081;
 var STATIC_CONTENT_DIR = __dirname+"/www/";
 var LOG_FILE = __dirname + './log/agent.log'
 
