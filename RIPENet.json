@@ -1,0 +1,31 @@
+{
+    "gateways":{
+        "ripe-gw":{
+            "IPs":["37.1.156.49/24" , "193.0.24.1/16"]
+        },
+        "tilab-gw":{
+            "IPs":["37.1.156.49/24" , "163.162.170.129/24"]
+        },
+        "internet-gw":{
+            "IPs":["37.1.156.49/24" , "163.162.170.129/24" , "8.8.8.8/24"]
+        }
+    },
+    "networks":{
+        "RIPENet":{
+            "description" : "RIPE WIFI",
+            "subnet": "37.1.156.49/24",
+            "gateways" : ["ripe-gw" , "internet-gw"]
+        },
+        "tilabNet":{
+            "description" : "Tilab",
+            "subnet": "163.162.170.0/24",
+            "gateways" : ["tilab-gw" , "internet-gw"],
+            "type": "p2p"
+        },
+        "internet":{
+            "description" : "Internet",
+            "subnet": "8.8.8.8/24",
+            "gateways" : ["internet-gw"]
+        }
+    }
+}

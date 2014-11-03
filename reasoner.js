@@ -14,7 +14,9 @@ var NET_STATUS_UNKNOWN = "gray";
 var NET_STATUS_OK = "green";
 var NET_STATUS_WARNING = "yellow";
 var NET_STATUS_NOK = "red";
-
+// Number of samples to keep
+var NET_STATUS_SAMPLES = 10;
+var DEFAULT_SAMPLE_TYPE = "twoWayD;elay.mean"
 
 var network=require("./network.js")
     ,_ = require("lodash")
@@ -183,10 +185,11 @@ function getCapabilities(){
  * Inititalizes the net Graph
  */
 function initNetGraph(){
-// Graph label
+    // Graph label
     netGraph.setGraph("mPlane DEMO NET");
-// Graph nodes
+    // Graph nodes
     _.each(netDef.networks , function(net , netName){
+        var name = network.UNSPECIFIED_NET;
         netGraph.setNode(netName , net.description);
         if (net.subnet == network.UNSPECIFIED_NET){
             __subnetIndex[network.UNSPECIFIED_NET] = netName; //INDEXED
@@ -195,11 +198,13 @@ function initNetGraph(){
         else{
             __subnetIndex[ip.cidr(net.subnet)] = netName; //INDEXED
             __netNameIndex[netName] = ip.cidr(net.subnet);
+            name = netName;
         }
-
+        // Array of circular objects containing samples
+        __netNameIndex[name].samples = {};
     });
     info("Subnet nodes edges created");
-// LEAFS edges!
+    // LEAFS edges!
     _.each(netDef.networks , function(net , netName){
         if (net.leafOf){
             netGraph.setEdge(netName, networkName(net.leafOf) , LEAF_GW);
@@ -208,8 +213,8 @@ function initNetGraph(){
     });
     info("Leaf nodes linked");
 
-// Graph edges from gateways
-// Edges are identified using subnets
+    // Graph edges from gateways
+    // Edges are identified using subnets
     _.each(netDef.gateways , function(gw , gwName){
         for (var i=0; i<gw.IPs.length ; i++){
             for (var j=0; j<gw.IPs.length;j++){
@@ -226,6 +231,29 @@ function initNetGraph(){
     info("Graph created");
     info("..."+netGraph.nodeCount()+" networks");
     info("..."+netGraph.edgeCount()+" links");
+}
+
+/**
+ * Stores a sample of type sampleType in a netName structure
+ * @param netName
+ * @param sampleValue
+ * @param sampleType
+ */
+function storeSample(netName , sampleValue , sampleType){
+    if (!sampleType)
+        sampleType = DEFAULT_SAMPLE_TYPE;
+    if (!__netNameIndex[netName].samples[sampleType])
+        __netNameIndex[netName].samples[sampleType] = new CBuffer(NET_STATUS_SAMPLES);
+    __netNameIndex[netName].samples[sampleType].push(sampleValue);
+}
+
+/**
+ * Shows sotored saples.
+ * @param netName
+ * @param sampleType
+ */
+function showSamples(netName , sampleType){
+    console.log( __netNameIndex[netName].samples[sampleType]);
 }
 
 /**
@@ -352,6 +380,14 @@ function checkStatus(){
                         var supResponse = mplane.from_dict(body);
                         if (supResponse instanceof mplane.Result){
                             unRegisterMeasure(rec.fromNet, rec.toNet);
+                            // Register the measure(s)
+                            result.get_result_column_values(REACHABILITY_CAPABILITY).forEach(function(sample,index){
+                                //FIXME: select the sampleType
+                                storeSample(rec.toNet , sample , sampleType)
+                            });
+                            // DEBUG
+                            showSamples(rec.toNet, DEFAULT_SAMPLE_TYPE);
+
                             //TODO: choose which analyzer has to be triggered from the resultType
                             analyzeDelay(mplane.from_dict(body) , {
                                 fromNet:rec.fromNet,
