@@ -56,7 +56,7 @@ cli.parse({
     key:['k' , 'Key file of the client' , 'string' , configuration.ssl.key],
     cert:['t' , 'Certificate file of the client' , 'string' , configuration.ssl.cert],
     netFile:['n' , 'Network definition file' , 'string' , configuration.main.networkDefinitionFile],
-    user:['u' , 'Login as user' , 'string' , 'demo']
+    mode:['m' , 'Operational mode [AUTO|TRIGGERED]' , 'string' , configuration.main.mode]
 });
 
 
@@ -118,17 +118,14 @@ getCapabilities();
  * @param config
  */
 function scan(config){
-    setInterval(function(){
-        cli.info("NETWORK FULL SCAN STARTED\n");
-        _.each(_.keys(SPTree) , function(fromLan){
-            _.each(_.keys(SPTree[fromLan]) , function(toLan){
-                if (fromLan != toLan){
-                    doPathMeasures(fromLan , toLan);
-                }
-            })
-        });
-    }
-    ,configuration.main.scan_period);
+    cli.info("NETWORK FULL SCAN STARTED\n");
+    _.each(_.keys(SPTree) , function(fromLan){
+        _.each(_.keys(SPTree[fromLan]) , function(toLan){
+            if (fromLan != toLan){
+                doPathMeasures(fromLan , toLan);
+            }
+        })
+    });
 }
 
 /**
@@ -183,11 +180,23 @@ function getCapabilities(){
         cli.info("INIT PHASE COMPLETED");
         cli.info("--------------------");
         console.log();
-        
+
         // Periodically scan all the net
-        scan();
-        // Periodically check if results are ready
-        checkStatus();
+        if (cli.options.mode == "AUTO"){
+            setInterval(function(){
+                    scan();
+                }
+                ,configuration.main.scan_period);
+            setInterval(function(){
+                    // Periodically check if results are ready
+                    checkStatus();
+                }
+                ,configuration.main.results_check_period);
+
+        }else{
+            // TODO: ADD here the code to listen for triggers!
+            cli.info("WAITING FOR SOMEONE AWAKING ME...")
+        }
     });
 }
 
@@ -339,50 +348,46 @@ function doPathMeasures( fromNet , toNet){
  * Periodically checks if any result is available and if needed triggers analysis module
  */
 function checkStatus(){
-    setInterval(function(){
-        cli.debug("Check network status");
-        _.each(_.keys(__specification_receipts__) , function(regID , index){
-            var rec = __specification_receipts__[regID];
-            cli.debug("... "+rec.fromNet+" -> "+rec.toNet)
-            supervisor.showResults(new mplane.Redemption({receipt: rec}) , {
-                    host:cli.options.supervisorHost,
-                    port:cli.options.supervisorPort,
-                    ca:cli.options.ca,
-                    key:cli.options.key,
-                    cert:cli.options.cert
-                },
-                function(err , response){
-                    if (err){
-                        if (err.message == 403){
-                            // Not available
-                            return;
-                        }else{
-                            showTitle("Error:"+body);
-                            return;
-                        }
-                    }else {
-                        var supResponse = mplane.from_dict(body);
-                        if (supResponse instanceof mplane.Result){
-                            unRegisterMeasure(rec.fromNet, rec.toNet);
-                            // Register the measure(s)
-                            supResponse.get_result_column_values(REACHABILITY_CAPABILITY).forEach(function(sample,index){
-                                //FIXME: select the sampleType
-                                storeSample(rec.toNet , sample , DEFAULT_SAMPLE_TYPE);
-                            });
-                            //TODO: choose which analyzer has to be triggered from the resultType
-                            analyzeDelay({
-                                fromNet:rec.fromNet,
-                                toNet:rec.toNet,
-                                sampleType:DEFAULT_SAMPLE_TYPE
-                            });
-                        }
-
+    cli.debug("Check network status");
+    _.each(_.keys(__specification_receipts__) , function(regID , index){
+        var rec = __specification_receipts__[regID];
+        cli.debug("... "+rec.fromNet+" -> "+rec.toNet)
+        supervisor.showResults(new mplane.Redemption({receipt: rec}) , {
+                host:cli.options.supervisorHost,
+                port:cli.options.supervisorPort,
+                ca:cli.options.ca,
+                key:cli.options.key,
+                cert:cli.options.cert
+            },
+            function(err , response){
+                if (err){
+                    if (err.message == 403){
+                        // Not available
+                        return;
+                    }else{
+                        showTitle("Error:"+body);
+                        return;
                     }
-                });
-        });
+                }else {
+                    var supResponse = mplane.from_dict(body);
+                    if (supResponse instanceof mplane.Result){
+                        unRegisterMeasure(rec.fromNet, rec.toNet);
+                        // Register the measure(s)
+                        supResponse.get_result_column_values(REACHABILITY_CAPABILITY).forEach(function(sample,index){
+                            //FIXME: select the sampleType
+                            storeSample(rec.toNet , sample , DEFAULT_SAMPLE_TYPE);
+                        });
+                        //TODO: choose which analyzer has to be triggered from the resultType
+                        analyzeDelay({
+                            fromNet:rec.fromNet,
+                            toNet:rec.toNet,
+                            sampleType:DEFAULT_SAMPLE_TYPE
+                        });
+                    }
 
-        //)});
-    }, configuration.main.results_check_period || 10000);
+                }
+            });
+    });
 }
 
 /**

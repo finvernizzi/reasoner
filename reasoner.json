@@ -7,7 +7,8 @@
         "results_check_period": 10000,
         "scan_period": 10000,
         "process_name": "mPlane Reasoner",
-        "networkDefinitionFile":"./demoNet.json"
+        "networkDefinitionFile":"./demoNet.json",
+        "mode":"AUTO"
     },
     "smartAutoMeasure":{
       "numRetries":10
