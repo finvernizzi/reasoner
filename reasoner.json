@@ -30,7 +30,7 @@
         ,"requestCert" : true
     },
     "delayAnalyzer":{
-        "rttThresoldGood":0.75,
-        "rttThresoldBad":1.00
+        "rttThresoldGood":50,
+        "rttThresoldBad":100
     }
 }

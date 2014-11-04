@@ -16,7 +16,7 @@ var NET_STATUS_WARNING = "yellow";
 var NET_STATUS_NOK = "red";
 // Number of samples to keep
 var NET_STATUS_SAMPLES = 10;
-var DEFAULT_SAMPLE_TYPE = "twoWayD;elay.mean"
+var DEFAULT_SAMPLE_TYPE = "delay.twoway"
 
 var network=require("./network.js")
     ,_ = require("lodash")
@@ -25,7 +25,10 @@ var network=require("./network.js")
     ,mplane = require('mplane')
     ,supervisor = require("mplane_http_transport")
     ,fs = require("fs")
-    ,cli = require("cli");
+    ,cli = require("cli")
+    ,CBuffer = require("CBuffer")
+    ,numbers = require("numbers")
+    ,is = require('is-type-of');
 
 //-----------------------------------------------------------------------------------------------------------
 // READ CONFIG
@@ -43,6 +46,7 @@ catch (err) {
 // Load the reference registry
 mplane.Element.initialize_registry(configuration.registry.file);
 
+cli.enable("status");
 // CLI params
 cli.parse({
     supervisorHost:  ['b', 'Supervisor address', 'ip', configuration.supervisor.hostName],
@@ -65,7 +69,7 @@ process.title = "mPlane reasoner";
 var __subnetIndex = {};
 // The dual of __subnetIndex: from a  net name to a net index
 var __netNameIndex = {};
-// ARRAY contentente tutte le misure disponibili (gia obj capability). Il DN [ aggiunto come feature DN
+// ARRAY with all available capability (DN added as feature)
 var __availableProbes = [];
 // Indexes for simply find available measures
 var __IndexProbesByNet ={};
@@ -75,7 +79,7 @@ var SPTree = null;
 
 // Pending specifications (reasoner receipts)
 var __specification_receipts__ = {};
-// Measrue already required.
+// Measure already required.
 // We can instantiate only 1 measure from one net to another
 // After wait times it cannot instyantiate a new measure, the measure is considered dead and removed
 var __registered_measures__ = {};
@@ -115,7 +119,7 @@ getCapabilities();
  */
 function scan(config){
     setInterval(function(){
-        showTitle("NETWORK FULL SCAN STARTED");
+        cli.info("NETWORK FULL SCAN STARTED\n");
         _.each(_.keys(SPTree) , function(fromLan){
             _.each(_.keys(SPTree[fromLan]) , function(toLan){
                 if (fromLan != toLan){
@@ -174,7 +178,13 @@ function getCapabilities(){
         });
 
         console.log("\n");
-        // Periodically scan al lthe net
+        console.log();
+        cli.info("--------------------");
+        cli.info("INIT PHASE COMPLETED");
+        cli.info("--------------------");
+        console.log();
+        
+        // Periodically scan all the net
         scan();
         // Periodically check if results are ready
         checkStatus();
@@ -200,8 +210,6 @@ function initNetGraph(){
             __netNameIndex[netName] = ip.cidr(net.subnet);
             name = netName;
         }
-        // Array of circular objects containing samples
-        __netNameIndex[name].samples = {};
     });
     info("Subnet nodes edges created");
     // LEAFS edges!
@@ -234,29 +242,6 @@ function initNetGraph(){
 }
 
 /**
- * Stores a sample of type sampleType in a netName structure
- * @param netName
- * @param sampleValue
- * @param sampleType
- */
-function storeSample(netName , sampleValue , sampleType){
-    if (!sampleType)
-        sampleType = DEFAULT_SAMPLE_TYPE;
-    if (!__netNameIndex[netName].samples[sampleType])
-        __netNameIndex[netName].samples[sampleType] = new CBuffer(NET_STATUS_SAMPLES);
-    __netNameIndex[netName].samples[sampleType].push(sampleValue);
-}
-
-/**
- * Shows sotored saples.
- * @param netName
- * @param sampleType
- */
-function showSamples(netName , sampleType){
-    console.log( __netNameIndex[netName].samples[sampleType]);
-}
-
-/**
  * Given 2 known networks names, if there is a probe in fromNet, checks reachability of toNet
  * Basically it requires a probe to do some measure(s) (REACHABILITY_CAPABILITY) from A to B, including all net on the PATH
  * IF fromNet has more that one probe available, one is choosen RANDOMLY
@@ -270,7 +255,7 @@ function doPathMeasures( fromNet , toNet){
     var probesId = hasProbeType(fromNetID , REACHABILITY_CAPABILITY);
     // Are there any probes in the from net?
     if (probesId.length == 0){
-         //info("No available probes to do measure from \'"+getNetworkDescription(fromNetID)+"\' to \'"+getNetworkDescription(toNetID)+"\'");
+         cli.debug("No available probes to do measure from \'"+getNetworkDescription(fromNetID)+"\' to \'"+getNetworkDescription(toNetID)+"\'");
         return;
     }
     //info(+getNetworkDescription(fromNetID)+"\' -> \'"+getNetworkDescription(toNetID)+"\'");
@@ -287,7 +272,7 @@ function doPathMeasures( fromNet , toNet){
     if (!SPTree[fromNet][toNet]){
         showTitle("No PATH available "+fromNet +"(" + fromNetID + ") -> "+toNet+"("+toNetID+")");
     }else{
-        info("Registering measure: "+fromNet + "->" + toNet);
+        cli.info("Registering measure: "+fromNet + "->" + toNet);
         // Array of IPs to be used ad target for our measures
         var targetIps = ipPath(fromNet , toNet);
         targetIps.forEach(function(curIP , index) {
@@ -355,11 +340,10 @@ function doPathMeasures( fromNet , toNet){
  */
 function checkStatus(){
     setInterval(function(){
-        info("-- Check network status");
-        //__specification_receipts__.forEach(function(rec,index){
+        cli.debug("Check network status");
         _.each(_.keys(__specification_receipts__) , function(regID , index){
             var rec = __specification_receipts__[regID];
-            info("-------- "+rec.fromNet+" -> "+rec.toNet)
+            cli.debug("... "+rec.fromNet+" -> "+rec.toNet)
             supervisor.showResults(new mplane.Redemption({receipt: rec}) , {
                     host:cli.options.supervisorHost,
                     port:cli.options.supervisorPort,
@@ -381,17 +365,15 @@ function checkStatus(){
                         if (supResponse instanceof mplane.Result){
                             unRegisterMeasure(rec.fromNet, rec.toNet);
                             // Register the measure(s)
-                            result.get_result_column_values(REACHABILITY_CAPABILITY).forEach(function(sample,index){
+                            supResponse.get_result_column_values(REACHABILITY_CAPABILITY).forEach(function(sample,index){
                                 //FIXME: select the sampleType
-                                storeSample(rec.toNet , sample , sampleType)
+                                storeSample(rec.toNet , sample , DEFAULT_SAMPLE_TYPE);
                             });
-                            // DEBUG
-                            showSamples(rec.toNet, DEFAULT_SAMPLE_TYPE);
-
                             //TODO: choose which analyzer has to be triggered from the resultType
-                            analyzeDelay(mplane.from_dict(body) , {
+                            analyzeDelay({
                                 fromNet:rec.fromNet,
-                                toNet:rec.toNet
+                                toNet:rec.toNet,
+                                sampleType:DEFAULT_SAMPLE_TYPE
                             });
                         }
 
@@ -409,7 +391,7 @@ function checkStatus(){
  */
 function dumpNetStatus(){
     setInterval(function(){
-        info("-- Dumping network status to "+configuration.dumpeToFile.file);
+        cli.debug("-- Dumping network status to "+configuration.dumpeToFile.file);
         var LENGTH_MAIN = 150;
         var LENGTH_SUB = 50;
         var netNodes = netGraph.nodes();
@@ -478,7 +460,7 @@ function dumpNetStatus(){
             if(err) {
                 showTitle(err);
             } else {
-                info("Network status dumped to file");
+                cli.debug("Network status dumped to file");
             }
         });
 
@@ -493,28 +475,24 @@ function dumpNetStatus(){
  *  fromNet: the net name from
  *  toNet: the net name to
  */
-function analyzeDelay(result , config){
-    if (!(result instanceof mplane.Result)){
-        cli.error("Malformed result received from supervisor");
-        return;
-    }
-    var curStatus = getNetworkStatus(getNetworkID(config.toNet));
-    //setNetworkDetail(getNetworkID(config.toNet) , "status" , NET_STATUS_UNKNOWN );
-    var RTT = (result.get_result_column_values(REACHABILITY_CAPABILITY))[0];
-    console.log(config.fromNet + " ->" + config.toNet +":" + RTT);
+function analyzeDelay(config){
+    // Read available samples for the toNet, for this type of measure
+    var samples = getSamples(config.toNet, config.sampleType);
+
+    var RTT = numbers.statistic.mean(samples);
+
     if (RTT <= configuration.delayAnalyzer.rttThresoldGood){
         setNetworkDetail(getNetworkID(config.toNet) , "status" , NET_STATUS_OK );
     }
-    if ((RTT >= configuration.delayAnalyzer.rttThresoldGood) && (RTT <= configuration.delayAnalyzer.rttThresoldBad)){
+    if ((RTT > configuration.delayAnalyzer.rttThresoldGood) && (RTT <= configuration.delayAnalyzer.rttThresoldBad)){
         setNetworkDetail(getNetworkID(config.toNet) , "status" , NET_STATUS_WARNING );
     }
-    if (RTT >= configuration.delayAnalyzer.rttThresoldBad){
+    if (RTT > configuration.delayAnalyzer.rttThresoldBad){
         setNetworkDetail(getNetworkID(config.toNet) , "status" , NET_STATUS_NOK );
     }
     if (!RTT)
         setNetworkDetail(getNetworkID(config.toNet) , "status" , NET_STATUS_UNKNOWN );
-    //if (curStatus != getNetworkStatus(getNetworkID(config.toNet)))
-        showTitle(getNetworkDescription(getNetworkID(config.toNet)) + " status: " + getNetworkStatus(getNetworkID(config.toNet)));
+    cli.info("... "+getNetworkDescription(getNetworkID(config.toNet)) + " status: " + getNetworkStatus(getNetworkID(config.toNet)));
 }
 
 
@@ -577,6 +555,54 @@ function getNetworkStatus(netID){
 function getNetworkID(netName){
     return __netNameIndex[netName];
 }
+
+
+/*************************************************************************************************
+/**             SAMPLES MANAGEMENT   **/
+/*************************************************************************************************
+
+/**
+ * Stores a sample of type sampleType in a netName structure
+ * @param netName
+ * @param sampleValue
+ * @param sampleType
+ */
+function storeSample(netName , sampleValue , sampleType){
+    if (!sampleType)
+        sampleType = DEFAULT_SAMPLE_TYPE;
+    // Initialize if needed
+    if (!getNetworkDetail(getNetworkID(netName) , "samples"))
+        setNetworkDetail(getNetworkID(netName) , "samples" , {});
+    var netSamples = getNetworkDetail(getNetworkID(netName) , "samples");
+    if (!netSamples[sampleType])
+        netSamples[sampleType] = new CBuffer(NET_STATUS_SAMPLES);
+
+    netSamples[sampleType].push(sampleValue);
+}
+/**
+ * Given a netName and a sampleType returns the current ARRAY of DATA
+ * @param netName
+ * @param sampleType
+ */
+function getSamples(netName, sampleType){
+    netSamples = getNetworkDetail(getNetworkID(netName) , "samples");
+    if (netSamples){
+        var ret=[];
+        // Check are all numbers
+        netSamples[sampleType].toArray().forEach(function(num){
+            if (is.number(parseFloat(num)))
+                ret.push(parseFloat(num));
+        });
+        return ret;
+    }
+    return null;
+}
+
+/*************************************************************************************************
+
+
+
+
 /**
  * Builds a Shortest Path Tree on the network graph
  */
@@ -688,7 +714,7 @@ function isLeafOf(checked , leafOf){
     var checkedInfo = ip.cidrSubnet(checked),
         leafOfInfo = ip.cidrSubnet(leafOf);
     if ((ip.toLong(checkedInfo.firstAddress) >= ip.toLong(leafOfInfo.firstAddress)) && (ip.toLong(checkedInfo.lastAddress) <= ip.toLong(leafOfInfo.lastAddress)) ){
-        console.log("---- "+checked+" leaf of "+leafOf)
+        cli.debug("---- "+checked+" leaf of "+leafOf)
         return true;
     }
     return false;
@@ -711,7 +737,6 @@ function isLeaf(netName){
  * @param netName
  */
 function parentNetIDOfLeaf(netName){
-    console.log(netDef);
     if (!isLeaf(netName)){
         showTitle("parentOfLeaf-- "+netName+" is not a leaf");
         return false;
@@ -725,6 +750,8 @@ function parentNetIDOfLeaf(netName){
  * @return an array of matching probeID if any
  */
 function hasProbeType(netId , type){
+    if (!type)
+        type = DEFAULT_SAMPLE_TYPE;
     // Do we have the net and a valid probe?
     if ((!__IndexProbesByNet[netId]) || (!__IndexProbesByType[type]))
         return [];
@@ -784,7 +811,6 @@ function registerReceipt(fromNet , toNet , receipt){
     }
     var regID =uniqueRegID(fromNet , toNet);
     if (!__registered_measures__[regID]){
-        //showTitle("Trying to register a receipt for a measure not REGISTERED! "+fromNet+" -> "+toNet);
         return false;
     }
     __specification_receipts__[regID] = receipt;

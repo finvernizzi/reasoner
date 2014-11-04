@@ -1,31 +1,36 @@
 {
     "gateways":{
         "ripe-gw":{
-            "IPs":["37.1.156.49/24" , "193.0.24.1/16"]
+            "IPs":["37.1.156.49/24" , "193.0.0.0/8"]
+        },
+        "ripe-uplink-gw":{
+            "IPs":["37.1.156.49/24" , "8.8.8.8/24"]
         },
         "tilab-gw":{
-            "IPs":["37.1.156.49/24" , "163.162.170.129/24"]
-        },
-        "internet-gw":{
-            "IPs":["37.1.156.49/24" , "163.162.170.129/24" , "8.8.8.8/24"]
+            "IPs":["8.8.8.8/24", "163.162.170.129/24"]
         }
     },
     "networks":{
         "RIPENet":{
             "description" : "RIPE WIFI",
+            "subnet": "193.0.0.0/8",
+            "gateways" : ["ripe-gw"]
+        },
+        "RIPEUplinkNet":{
+            "description" : "RIPE Internet connection",
             "subnet": "37.1.156.49/24",
-            "gateways" : ["ripe-gw" , "internet-gw"]
+            "gateways" : ["ripe-uplink-gw"]
         },
         "tilabNet":{
             "description" : "Tilab",
             "subnet": "163.162.170.0/24",
-            "gateways" : ["tilab-gw" , "internet-gw"],
+            "gateways" : ["tilab-gw"],
             "type": "p2p"
         },
         "internet":{
             "description" : "Internet",
             "subnet": "8.8.8.8/24",
-            "gateways" : ["internet-gw"]
+            "gateways" : ["internet-gw", "tilab-gw" , "ripe-uplink-gw"]
         }
     }
 }
