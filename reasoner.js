@@ -28,7 +28,9 @@ var network=require("./network.js")
     ,cli = require("cli")
     ,CBuffer = require("CBuffer")
     ,numbers = require("numbers")
-    ,is = require('is-type-of');
+    ,is = require('is-type-of')
+    http = require('http'),
+    url  = require('url');
 
 //-----------------------------------------------------------------------------------------------------------
 // READ CONFIG
@@ -56,7 +58,8 @@ cli.parse({
     key:['k' , 'Key file of the client' , 'string' , configuration.ssl.key],
     cert:['t' , 'Certificate file of the client' , 'string' , configuration.ssl.cert],
     netFile:['n' , 'Network definition file' , 'string' , configuration.main.networkDefinitionFile],
-    mode:['m' , 'Operational mode [AUTO|TRIGGERED]' , 'string' , configuration.main.mode]
+    mode:['m' , 'Operational mode [AUTO|TRIGGERED]' , 'string' , configuration.main.mode],
+    triggerPort:['l' , 'Listen on this port for triggers in TRIGGERED mode' , 'int' , configuration.EXTTrigger.port]
 });
 
 
@@ -101,8 +104,8 @@ initNetGraph();
 
 updateSPTree();
 
+// Periodically dumps net status
 dumpNetStatus();
-
 
 // This find capabilities and then start scan and checkStatus
 getCapabilities();
@@ -192,10 +195,8 @@ function getCapabilities(){
                     checkStatus();
                 }
                 ,configuration.main.results_check_period);
-
         }else{
-            // TODO: ADD here the code to listen for triggers!
-            cli.info("WAITING FOR SOMEONE AWAKING ME...")
+            waitForTriggers();
         }
     });
 }
@@ -835,6 +836,31 @@ function unRegisterMeasure(fromNet , toNet){
 
 /****************************************************************************************************************/
 
+/**
+ * Waits for trigger messages in TRIGGERED mode
+ */
+function waitForTriggers(){
+    var server = http.createServer(function (request, response) {
+        //console.log(url.parse(request.url, true).query)
+
+        response.writeHead(200, {"Content-Type": "text/plain"});
+        response.end("mPlane test PAGE");
+
+        setInterval(function(){
+                scan();
+            }
+            ,configuration.main.scan_period);
+        setInterval(function(){
+                // Periodically check if results are ready
+                checkStatus();
+            }
+            ,configuration.main.results_check_period);
+
+    });
+
+    server.listen(cli.options.triggerPort);
+    cli.info("Waiting someone triggers me at http://127.0.0.1:"+cli.options.triggerPort+"/");
+}
 
 /****************************************************************************************************************/
 
