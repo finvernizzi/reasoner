@@ -339,8 +339,7 @@ function doPathMeasures( fromNet , toNet){
                                 rec.fromNet = fromNet;
                                 rec.toNet = toNet;
                                 rec.destonationIP = curIP;
-                                rec.sourceIP = probe.ipAddrP;
-                                console.log(probe)
+                                rec.sourceIP = probe.ipAddr;
                                 registerReceipt(fromNet , toNet , rec);
                             }
                         }
