@@ -30,7 +30,8 @@ var network=require("./network.js")
     ,numbers = require("numbers")
     ,is = require('is-type-of')
     http = require('http'),
-    url  = require('url');
+    url  = require('url')
+    ,agent = require("./agent.js");
 
 //-----------------------------------------------------------------------------------------------------------
 // READ CONFIG
@@ -44,6 +45,7 @@ catch (err) {
     process.exit();
 }
 //-----------------------------------------------------------------------------------------------------------
+
 
 // Load the reference registry
 mplane.Element.initialize_registry(configuration.registry.file);
@@ -59,6 +61,7 @@ cli.parse({
     cert:['t' , 'Certificate file of the client' , 'string' , configuration.ssl.cert],
     netFile:['n' , 'Network definition file' , 'string' , configuration.main.networkDefinitionFile],
     mode:['m' , 'Operational mode [AUTO|TRIGGERED]' , 'string' , configuration.main.mode],
+    agent:['a' , 'Run the web agent' , 'bool' , false],
     triggerPort:['l' , 'Listen on this port for triggers in TRIGGERED mode' , 'int' , configuration.EXTTrigger.port]
 });
 
@@ -66,6 +69,11 @@ cli.parse({
 motd();
 // Process name for ps
 process.title = "mPlane reasoner";
+
+// start the agent
+if (cli.options.agent)
+    agent.start();
+
 
 // Maps a subnet(ip.cidr()) to network name(that is the label/id of nodes in netGraph/netDef)
 // This is the base index for finding all nodes/edges
