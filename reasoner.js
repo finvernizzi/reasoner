@@ -295,7 +295,7 @@ function doPathMeasures( fromNet , toNet){
         var targetIps = ipPath(fromNet , toNet);
         targetIps.forEach(function(curIP , index) {
             // Can we register a measure from the nets?
-            if (!registerMeasure(fromNet , toNet))
+            if (!registerMeasure(fromNet , toNet) || !curIP)
                 return;
             var destParam = probe.getParameter("destination.ip4");
             // Check if the destination is accepted by the probe
