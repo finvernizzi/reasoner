@@ -301,9 +301,15 @@ function doPathMeasures( fromNet , toNet){
             if ((destParam.isValid(curIP) && destParam.met_by(curIP, undefined))){
                 cli.info("     TARGET: "+curIP);
                 spec.set_when("now + 1s");
-                spec.setParameterValue("destination.ip4", curIP);
-                spec.setParameterValue("source.ip4", probe.ipAddr);
-                spec.set_metadata_value("Destination_NET" , toNet);
+                try{
+                    spec.setParameterValue("destination.ip4", curIP);
+                    spec.setParameterValue("source.ip4", probe.ipAddr);
+                    spec.set_metadata_value("Destination_NET" , toNet);
+                }catch(e){
+                    cli.error("Error in parameter set");
+                    cli.error(e);
+                }
+
 
                 // Very bad... for now it works
                 if (probe.has_parameter("number"))
