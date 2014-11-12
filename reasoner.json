@@ -16,7 +16,7 @@
     },
     "smartAutoMeasure":{
       "numRetries":10,
-      "netStatusSamples":3
+      "netStatusSamples":5
     },
     "dumpeToFile":{
       "period": 5000,
@@ -36,7 +36,7 @@
         ,"requestCert" : true
     },
     "delayAnalyzer":{
-        "rttThresoldGood":50,
-        "rttThresoldBad":100
+        "rttThresoldGood":0.50,
+        "rttThresoldBad":1
     }
 }
