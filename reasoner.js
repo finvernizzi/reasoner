@@ -305,17 +305,15 @@ function doPathMeasures( fromNet , toNet){
                     spec.setParameterValue("destination.ip4", curIP);
                     spec.setParameterValue("source.ip4", probe.ipAddr);
                     spec.set_metadata_value("Destination_NET" , toNet);
+                    // Very bad... for now it works
+                    if (probe.has_parameter("number"))
+                        spec.setParameterValue('number', "5");
+                    // We changed the params, so we should update the default token, or we will have a lot of specification with the same token!!!
+                    spec.update_token();
                 }catch(e){
                     cli.error("Error in parameter set");
                     cli.error(e);
                 }
-
-
-                // Very bad... for now it works
-                if (probe.has_parameter("number"))
-                    spec.setParameterValue('number', "5");
-                // We changed the params, so we should update the default token, or we will have a lot of specification with the same token!!!
-                spec.update_token();
                 supervisor.registerSpecification(
                 spec
                 , probe.DN
