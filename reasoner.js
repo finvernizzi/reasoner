@@ -304,7 +304,7 @@ function doPathMeasures( fromNet , toNet){
                 spec.setParameterValue("destination.ip4", curIP);
                 spec.setParameterValue("source.ip4", probe.ipAddr);
                 spec.set_metadata_value("Destination_NET" , toNet);
-                
+
                 // Very bad... for now it works
                 if (probe.has_parameter("number"))
                     spec.setParameterValue('number', "5");
