@@ -14,8 +14,6 @@ var NET_STATUS_UNKNOWN = "gray";
 var NET_STATUS_OK = "green";
 var NET_STATUS_WARNING = "yellow";
 var NET_STATUS_NOK = "red";
-// Number of samples to keep
-var NET_STATUS_SAMPLES = 10;
 var DEFAULT_SAMPLE_TYPE = "delay.twoway"
 
 var network=require("./network.js")
@@ -62,7 +60,8 @@ cli.parse({
     netFile:['n' , 'Network definition file' , 'string' , configuration.main.networkDefinitionFile],
     mode:['m' , 'Operational mode [AUTO|TRIGGERED]' , 'string' , configuration.main.mode],
     agent:['a' , 'Run the web agent' , 'bool' , false],
-    triggerPort:['l' , 'Listen on this port for triggers in TRIGGERED mode' , 'int' , configuration.EXTTrigger.port]
+    triggerPort:['l' , 'Listen on this port for triggers in TRIGGERED mode' , 'int' , configuration.EXTTrigger.port],
+    netStatusSamples:['u' , 'Number of samples for network status' , 'int' , configuration.smartAutoMeasure.netStatusSamples],
 });
 
 
@@ -588,7 +587,7 @@ function storeSample(netName , sampleValue , sampleType){
         setNetworkDetail(getNetworkID(netName) , "samples" , {});
     var netSamples = getNetworkDetail(getNetworkID(netName) , "samples");
     if (!netSamples[sampleType])
-        netSamples[sampleType] = new CBuffer(NET_STATUS_SAMPLES);
+        netSamples[sampleType] = new CBuffer(configuration.options.netStatusSamples);
 
     netSamples[sampleType].push(sampleValue);
 }

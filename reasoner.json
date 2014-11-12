@@ -15,7 +15,8 @@
        "port":"7001"
     },
     "smartAutoMeasure":{
-      "numRetries":10
+      "numRetries":10,
+      "netStatusSamples":3
     },
     "dumpeToFile":{
       "period": 5000,
