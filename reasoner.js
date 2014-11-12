@@ -587,7 +587,7 @@ function storeSample(netName , sampleValue , sampleType){
         setNetworkDetail(getNetworkID(netName) , "samples" , {});
     var netSamples = getNetworkDetail(getNetworkID(netName) , "samples");
     if (!netSamples[sampleType])
-        netSamples[sampleType] = new CBuffer(configuration.options.netStatusSamples);
+        netSamples[sampleType] = new CBuffer(cli.options.netStatusSamples);
 
     netSamples[sampleType].push(sampleValue);
 }
