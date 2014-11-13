@@ -272,12 +272,12 @@ function doPathMeasures( fromNet , toNet){
     var probesId = hasProbeType(fromNetID , REACHABILITY_CAPABILITY);
     // Are there any probes in the from net?
     if (probesId.length == 0){
-         cli.debug("No available probes to do measure from \'"+getNetworkDescription(fromNetID)+"\' to \'"+getNetworkDescription(toNetID)+"\'");
+        cli.debug("No available probes to do measure from \'"+getNetworkDescription(fromNetID)+"\' to \'"+getNetworkDescription(toNetID)+"\'");
         return;
     }
-    //info(+getNetworkDescription(fromNetID)+"\' -> \'"+getNetworkDescription(toNetID)+"\'");
-    // Randomly select a probe from available ones if no one is selected
-    var probe = __availableProbes[Math.floor(Math.random() * (probesId.length - 1) )];
+    // Randomly select a probe from available capabilities
+    //var probe = __availableProbes[Math.floor(Math.random() * (probesId.length -1) )];
+    var probe = __availableProbes[getRandomInt(0,(probesId.length -1))];
     try{
         var spec = new mplane.Specification(probe);
     }catch(e){
@@ -289,70 +289,77 @@ function doPathMeasures( fromNet , toNet){
     if (!SPTree[fromNet][toNet]){
         showTitle("No PATH available "+fromNet +"(" + fromNetID + ") -> "+toNet+"("+toNetID+")");
     }else{
-        cli.info("Registering measure: "+fromNet + "->" + toNet);
+        cli.info("Considering a new measure: "+fromNet + "->" + toNet);
         // Array of IPs to be used ad target for our measures
         var targetIps = ipPath(fromNet , toNet);
         targetIps.forEach(function(curIP , index) {
             // Can we register a measure from the nets?
-            if (!registerMeasure(fromNet , toNet) || !curIP)
+            /*if (!registerMeasure(fromNet , toNet) || !curIP)
                 return;
-            var destParam = probe.getParameter("destination.ip4");
-            // Check if the destination is accepted by the probe
-            if ((destParam.isValid(curIP) && destParam.met_by(curIP, undefined))){
-                cli.info("     TARGET: "+curIP);
-                spec.set_when("now + 1s");
-                try{
-                    spec.setParameterValue("destination.ip4", curIP);
-                    spec.setParameterValue("source.ip4", probe.ipAddr);
-                    spec.set_metadata_value("Destination_NET" , toNet);
-                    // Very bad... for now it works
-                    if (probe.has_parameter("number"))
-                        spec.setParameterValue('number', "5");
-                    // We changed the params, so we should update the default token, or we will have a lot of specification with the same token!!!
-                    spec.update_token();
-                }catch(e){
-                    cli.error("Error in parameter set");
-                    cli.error(e);
-                }
-                supervisor.registerSpecification(
-                spec
-                , probe.DN
-                , {
-                    host: cli.options.supervisorHost,
-                    port: cli.options.supervisorPort,
-                    keyFile: cli.options.key,
-                    certFile: cli.options.cert,
-                    caFile: cli.options.ca
-                },
-                function (err, receipt) {
-                    if (err)
-                        console.log(err);
-                    else {
-                        // Register the receipt
-                        var rec = mplane.from_dict(JSON.parse(receipt));
-                        rec._eventTime = new Date(); // Informational
-
-                        // The RI does not set the label in the receipt
-                        // Since we have it from the spec, simply set it in the receipt
-                        rec.set_label(spec.get_label());
-                        if (!(rec instanceof mplane.Receipt)) {
-                            cli.error("The returned message is not a valid Receipt");
-                        } else {
-                            // We keep local registry of all spec and relative receipts
-                            if (rec){
-                                rec._specification = spec;
-                                rec.fromNet = fromNet;
-                                rec.toNet = toNet;
-                                rec.destonationIP = curIP;
-                                rec.sourceIP = probe.ipAddr;
-                                registerReceipt(fromNet , toNet , rec);
-                            }
-                        }
+            */
+            // If we can register the measure, proceed
+            if (registerMeasure(fromNet , toNet) && curIP) {
+                var destParam = probe.getParameter("destination.ip4");
+                // Check if the destination is accepted by the probe
+                if ((destParam.isValid(curIP) && destParam.met_by(curIP, undefined))) {
+                    cli.info("     TARGET: " + curIP);
+                    spec.set_when("now + 1s");
+                    try {
+                        spec.setParameterValue("destination.ip4", curIP);
+                        spec.setParameterValue("source.ip4", probe.ipAddr);
+                        spec.set_metadata_value("Destination_NET", toNet);
+                        // Very bad... for now it works
+                        if (probe.has_parameter("number"))
+                            spec.setParameterValue('number', "5");
+                        // We changed the params, so we should update the default token, or we will have a lot of specification with the same token!!!
+                        spec.update_token();
+                    } catch (e) {
+                        cli.error("Error in parameter set");
+                        cli.error(e);
                     }
-                });
+                    supervisor.registerSpecification(
+                        spec
+                        , probe.DN
+                        , {
+                            host: cli.options.supervisorHost,
+                            port: cli.options.supervisorPort,
+                            keyFile: cli.options.key,
+                            certFile: cli.options.cert,
+                            caFile: cli.options.ca
+                        },
+                        function (err, receipt) {
+                            if (err)
+                                console.log(err);
+                            else {
+                                // Register the receipt
+                                var rec = mplane.from_dict(JSON.parse(receipt));
+                                rec._eventTime = new Date(); // Informational
+
+                                // The RI does not set the label in the receipt
+                                // Since we have it from the spec, simply set it in the receipt
+                                rec.set_label(spec.get_label());
+                                if (!(rec instanceof mplane.Receipt)) {
+                                    cli.error("The returned message is not a valid Receipt");
+                                } else {
+                                    // We keep local registry of all spec and relative receipts
+                                    if (rec) {
+                                        rec._specification = spec;
+                                        rec.fromNet = fromNet;
+                                        rec.toNet = toNet;
+                                        rec.destonationIP = curIP;
+                                        rec.sourceIP = probe.ipAddr;
+                                        registerReceipt(fromNet, toNet, rec);
+                                    }
+                                }
+                            }
+                        });
+                } else {
+                    cli.info("... " + curIP + " is not a valid value for this capability");
+                }
             }else{
-                cli.info("... "+curIP + " not accepted by probe");
+                cli.info("     No slots available");
             }
+
         });
     }
 }
@@ -411,7 +418,6 @@ function dumpNetStatus(){
     setInterval(function(){
         cli.debug("-- Dumping network status to "+configuration.dumpeToFile.file);
         var LENGTH_MAIN = 150;
-        var LENGTH_SUB = 50;
         var netNodes = netGraph.nodes();
         var netEdges = netGraph.edges();
         var added = [];
@@ -435,7 +441,7 @@ function dumpNetStatus(){
                 shape = "image";
                 image = getNetworkDetail(getNetworkID(lan) , "image");
             }
-             color = getNetworkDetail(getNetworkID(lan) , "status") || "gray";
+            color = getNetworkDetail(getNetworkID(lan) , "status") || "gray";
             ret.nodes.push(
                 {id: lan
                 ,label: lan
@@ -785,7 +791,7 @@ function networkName(netId){
 /****************************************************************************************************************/
 /*          smart Auto Measure
 
-In order to avoid to many measure instantiated, we have only a measure we can instantiate from 2 networks
+In order to avoid to many measure instantiated, only a measure a time can be instantiate between 2 networks
 After num_retries of instantiating a measure and the slot is not free, the registered measure is considered dead and removed
 
 */
@@ -922,4 +928,12 @@ function showTitle(text){
     console.log(pad("",text.length,"-"));
     console.log(text);
     console.log(pad("",text.length,"-"));
+}
+
+/**
+ * Returns a random integer between min (inclusive) and max (inclusive)
+ * Using Math.round() will give you a non-uniform distribution!
+ */
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
