@@ -422,6 +422,7 @@ function dumpNetStatus(){
             nodes : [],
             edges : []
         }
+        ,tmpColor = {};
 
         netNodes.forEach(function(lan , index){
             var radius = 20,
@@ -438,6 +439,10 @@ function dumpNetStatus(){
                 image = getNetworkDetail(getNetworkID(lan) , "image");
             }
             color = getNetworkDetail(getNetworkID(lan) , "status") || "gray";
+            // For leafs we color the edge
+            if (isLeaf(lan)){
+                tmpColor[lan] == color;
+            }
             ret.nodes.push(
                 {id: lan
                 ,label: lan
@@ -459,8 +464,13 @@ function dumpNetStatus(){
 
             if (label === LEAF_GW){
                 label = "";
-                style = "dash-line"
+                style = "dash-line";
+                if (tmpColor[edge.w])
+                    color = tmpColor[edge.w];
+                if (tmpColor[edge.v])
+                    color = tmpColor[edge.v];
             }
+
             // We add only an edge between 2 nodes since we do not distinguish up/down
             if (_.indexOf(added, "from:"+edge.w+"to:"+edge.v ) == -1)
                 ret.edges.push(
