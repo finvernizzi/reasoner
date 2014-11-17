@@ -294,7 +294,6 @@ function doPathMeasures( fromNet , toNet){
         var targetIps = ipPath(fromNet , toNet);
         targetIps.forEach(function(curIP , index) {
             // If we can register the measure, proceed
-            console.log(".... IP:"+curIP);
             if (registerMeasure(fromNet , toNet) && curIP) {
                 var destParam = probe.getParameter("destination.ip4");
                 // Check if the destination is accepted by the probe
@@ -638,7 +637,7 @@ function updateSPTree(){
 }
 
 /**
- * Returns IPs to be checked (destinations) on the path from ftomNet to toNet.
+ * Returns IPs to be checked (destinations) on the path from fromNet to toNet.
  * Uses the SPTree
  */
 function ipPath(fromNet , toNet){
@@ -656,8 +655,11 @@ function ipPath(fromNet , toNet){
         var target = SPTree[fromNet][next].predecessor,
             gwIP;
         if (next != fromNet){
-            if (isLeaf(next))
-                ret.push(getNetworkSubnet(next));
+            if (isLeaf(next)){
+                // If it is a leaf we directly use the IP (it should be a /32)
+                var sp = getNetworkSubnet((getNetworkID(next))).split("/");
+                ret.push(sp[0]);
+            }
             else{
                 gwIP = gatewayIpOnNet(netGraph.edge(next , target) , next);
                 if (gwIP){
@@ -686,7 +688,7 @@ function ipBelongsToNetId(IPadd){
     return ret;
 }
 /**
- * Which IP from gwName is on netName?
+ * Which IP from gwName ones is on netName?
  */
 function gatewayIpOnNet(gwName , netName){
     if (!gwName || !netName || (gwName == LEAF_GW))
