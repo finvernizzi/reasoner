@@ -313,6 +313,7 @@ function doPathMeasures( fromNet , toNet){
                             spec.setParameterValue('number', "5");
                         // We changed the params, so we should update the default token, or we will have a lot of specification with the same token!!!
                         spec.update_token();
+                        console.log(spec);
                     } catch (e) {
                         cli.error("Error in parameter set");
                         cli.error(e);
