@@ -457,7 +457,8 @@ function dumpNetStatus(){
         });
 
         for (var i=0 ; i<netEdges.length ; i++){
-            var edge = netEdges[i];
+            var edge = netEdges[i]
+                ,color = "gray";
 
             var label = netGraph.edge(edge.v , edge.w)
                 ,style = "line";
@@ -479,7 +480,7 @@ function dumpNetStatus(){
                         ,from: edge.v
                         ,to: edge.w
                          ,length: LENGTH_MAIN
-                         ,color:"gray"
+                         ,color:color
                          ,label:label
                          ,style:style
                    });
