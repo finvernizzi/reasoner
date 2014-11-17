@@ -473,7 +473,7 @@ function dumpNetStatus(){
                         ,from: edge.v
                         ,to: edge.w
                          ,length: LENGTH_MAIN
-                         ,color:color
+                         ,color:"gray"
                          ,label:label
                          ,style:style
                    });
