@@ -357,7 +357,7 @@ function doPathMeasures( fromNet , toNet){
                     cli.info("... " + curIP + " is not a valid value for this capability");
                 }
             }else{
-                cli.info("     No slots available");
+                cli.debug("     No slots available");
             }
 
         });
