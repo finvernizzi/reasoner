@@ -609,7 +609,7 @@ function storeSample(netName , sampleValue , sampleType){
     var netSamples = getNetworkDetail(getNetworkID(netName) , "samples");
     if (!netSamples[sampleType])
         netSamples[sampleType] = new CBuffer(cli.options.netStatusSamples);
-    if (!_.isNull(sampleValue) && !_.isNaN(sampleValue))
+    if (!_.isNull(sampleValue) && !_.isNaN(sampleValue) && parseFloat(sampleValue))
         netSamples[sampleType].push(sampleValue);
 }
 /**
