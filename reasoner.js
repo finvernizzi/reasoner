@@ -523,6 +523,8 @@ function analyzeDelay(config){
     }
     if (!RTT)
         setNetworkDetail(getNetworkID(config.toNet) , "status" , NET_STATUS_UNKNOWN );
+    cli.debug("Samples:"+samples.join(" ; "));
+    cli.debug("RTT:"+RTT);
     cli.info("... "+getNetworkDescription(getNetworkID(config.toNet)) + " status: " + getNetworkStatus(getNetworkID(config.toNet)));
 }
 
