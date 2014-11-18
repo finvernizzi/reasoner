@@ -889,6 +889,7 @@ function waitForTriggers(){
     });
 
     server.listen(cli.options.triggerPort);
+    console.log(server.address());
     cli.info("Waiting someone triggers me at http://"+server.address()+"/"+cli.options.triggerPort+"/");
 }
 
