@@ -874,9 +874,10 @@ function waitForTriggers(){
         //console.log(url.parse(request.url, true).query)
 
         response.writeHead(200, {"Content-Type": "text/plain"});
-        response.end("mPlane test PAGE");
+        response.end("You have succesfully triggered the REASONER!");
 
         setInterval(function(){
+                cli.debug("Someone triggered me!");
                 scan();
             }
             ,configuration.main.scan_period);
@@ -889,7 +890,7 @@ function waitForTriggers(){
     });
 
     server.listen(cli.options.triggerPort);
-    cli.info("Waiting someone triggers me at http://"+server.address().address+"/"+cli.options.triggerPort+"/");
+    cli.info("Waiting someone triggers me at http://"+server.address().address+":"+cli.options.triggerPort+"/");
 }
 
 /****************************************************************************************************************/
