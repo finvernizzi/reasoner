@@ -609,7 +609,8 @@ function storeSample(netName , sampleValue , sampleType){
     var netSamples = getNetworkDetail(getNetworkID(netName) , "samples");
     if (!netSamples[sampleType])
         netSamples[sampleType] = new CBuffer(cli.options.netStatusSamples);
-    netSamples[sampleType].push(sampleValue);
+    if (!_.isNull(sampleValue) && !_.isNaN(sampleValue))
+        netSamples[sampleType].push(sampleValue);
 }
 /**
  * Given a netName and a sampleType returns the current ARRAY of DATA
