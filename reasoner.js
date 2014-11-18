@@ -298,7 +298,6 @@ function doPathMeasures( fromNet , toNet){
                 var destParam = probe.getParameter("destination.ip4");
                 // Check if the destination is accepted by the probe
                 if ((destParam.isValid(curIP) && destParam.met_by(curIP, undefined))) {
-                    cli.info("     TARGET: " + curIP);
                     spec.set_when("now + 1s");
                     try {
                         spec.setParameterValue("destination.ip4", curIP);
@@ -327,6 +326,7 @@ function doPathMeasures( fromNet , toNet){
                             if (err)
                                 console.log(err);
                             else {
+                                cli.info("     Measure registered (" + curIP+")");
                                 // Register the receipt
                                 var rec = mplane.from_dict(JSON.parse(receipt));
                                 rec._eventTime = new Date(); // Informational
