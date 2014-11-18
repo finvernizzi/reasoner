@@ -276,8 +276,8 @@ function doPathMeasures( fromNet , toNet){
         return;
     }
     // Randomly select a probe from available capabilities
-    //var probe = __availableProbes[Math.floor(Math.random() * (probesId.length -1) )];
-    var probe = __availableProbes[getRandomInt(0,(probesId.length -1))];
+    //var probe = __availableProbes[getRandomInt(0,(probesId.length -1))];
+    var probe = __availableProbes[0];
     try{
         var spec = new mplane.Specification(probe);
     }catch(e){
