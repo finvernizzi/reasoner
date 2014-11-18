@@ -866,6 +866,7 @@ function unRegisterMeasure(fromNet , toNet){
 
 /****************************************************************************************************************/
 
+var triggered = false;
 /**
  * Waits for trigger messages in TRIGGERED mode
  */
@@ -878,7 +879,9 @@ function waitForTriggers(){
 
         setInterval(function(){
                 cli.debug("Someone triggered me!");
-                scan();
+                if (!triggered)
+                    scan();
+                triggered = true;
             }
             ,configuration.main.scan_period);
         setInterval(function(){
