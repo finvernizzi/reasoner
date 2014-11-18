@@ -889,7 +889,7 @@ function waitForTriggers(){
     });
 
     server.listen(cli.options.triggerPort);
-    cli.info("Waiting someone triggers me at http://127.0.0.1:"+cli.options.triggerPort+"/");
+    cli.info("Waiting someone triggers me at on:"+cli.options.triggerPort+"/");
 }
 
 /****************************************************************************************************************/
