@@ -158,12 +158,12 @@ function getCapabilities(){
                 if (_.indexOf(capability.getParameterNames() , PARAM_PROBE_SOURCE) === -1){
                     showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
                 }else{
-                    descriptions.push(capability.get_label() + " : " +capability.result_column_names().join(" , "));
+                    descriptions.push(DN + "..." +capability.get_label() + " : " +capability.result_column_names().join(" , "));
                     var sourceParamenter = capability.getParameter(PARAM_PROBE_SOURCE);
                     var ipSourceNet = (new mplane.Constraints(sourceParamenter.getConstraints()['0'])).getParam();
                     capability.ipAddr= ipSourceNet;
                     // Add to the known capabilities
-                    var index = (__availableProbes.push(capability))-1;
+                    var index = (__availableProbes[DN].push(capability))-1;
                     var netId = ipBelongsToNetId(ipSourceNet);
                     if (netId){
                         if (!__IndexProbesByNet[netId])
