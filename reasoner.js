@@ -154,6 +154,7 @@ function getCapabilities(){
                 //if (!__availableProbes[DN])
                 //    __availableProbes[DN] = [];
                 capability.DN = DN;
+
                 // If source.ip4 param is not present we have no way to know where the probe is with respect of our net
                 if (_.indexOf(capability.getParameterNames() , PARAM_PROBE_SOURCE) === -1){
                     showTitle("The capability has no "+PARAM_PROBE_SOURCE+" param");
@@ -277,7 +278,7 @@ function doPathMeasures(fromNet , toNet){
     }
     // Randomly select a probe from available capabilities
     //var probe = __availableProbes[getRandomInt(0,(probesId.length -1))];
-    var probe = __availableProbes[0];
+    var probe = __availableProbes[probesId[0]];
     try{
         var spec = new mplane.Specification(probe);
     }catch(e){
