@@ -169,5 +169,9 @@ Just  type node ./reasoner.js -h to see the help.
 
 One of the most important option is probabily -a that you shuld set to true if you want the integrated HTTP server to start.
 
+##LICENSE
+
+This software is released under the [BSD](http://en.wikipedia.org/wiki/BSD_licenses#2-clause_license_.28.22Simplified_BSD_License.22_or_.22FreeBSD_License.22.29) license.
+
 
 
