@@ -165,22 +165,6 @@ As any mplane component needs to have a registry, that should be a file correctl
 ## Runtime options
 
 The reasoner has a number of exposed otions that can override configuration file.
-
-```json
-supervisorHost:  ['b', 'Supervisor address', 'ip', configuration.supervisor.hostName],
-    supervisorPort:  ['p', 'Supervisor port', 'int', configuration.supervisor.listenPort],
-    SSL:['s', 'Use SSL in supervisor connections', 'bool', true],
-    ca:['c' , 'Certificate file of the Certification Auth' , 'string' , configuration.ssl.ca],
-    key:['k' , 'Key file of the client' , 'string' , configuration.ssl.key],
-    cert:['t' , 'Certificate file of the client' , 'string' , configuration.ssl.cert],
-    netFile:['n' , 'Network definition file' , 'string' , configuration.main.networkDefinitionFile],
-    mode:['m' , 'Operational mode [AUTO|TRIGGERED]' , 'string' , configuration.main.mode],
-    agent:['a' , 'Run the web agent' , 'bool' , false],
-    triggerPort:['l' , 'Listen on this port for triggers in TRIGGERED mode' , 'int' , configuration.EXTTrigger.port],
-    netStatusSamples:['u' , 'Number of samples for network status' , 'int' , configuration.smartAutoMeasure.netStatusSamples],
-    
-```
-
 Just  type node ./reasoner.js -h to see the help.
 
 One of the most important option is probabily -a that you shuld set to true if you want the integrated HTTP server to start.
