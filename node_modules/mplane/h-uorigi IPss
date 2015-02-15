@@ -1,0 +1,219 @@
+* [33mcommit 58fc2eba89325314f76150a817347bd6db86c88c[m
+[31m|[m Author: invernizzi <fabrizio.invernizzi@telecomitalia.it>
+[31m|[m Date:   Thu Oct 2 13:04:08 2014 +0200
+[31m|[m 
+[31m|[m     Allineamento
+[31m|[m    
+[31m|[m * [33mcommit a4d6401c6fd6fe06e23d471841493bf77d247911[m
+[31m|[m[31m/[m  Author: invernizzi <fabrizio.invernizzi@telecomitalia.it>
+[31m|[m   Date:   Thu Oct 2 12:50:58 2014 +0200
+[31m|[m   
+[31m|[m       Working on best integration with Official mPlane RI.
+[31m|[m       Some new features.
+[31m|[m       
+[31m|[m       - Specification, Statement, Exception from_dict functions now correctly
+[31m|[m         return a new specification from the received JSON
+[31m|[m         - thrown error better descriptions
+[31m|[m         - a Parameter can be created from a Parameter (obvious but now also
+[31m|[m           implemented...)
+[31m|[m           - a Specification can be created from any compatible obj (even from a
+[31m|[m             Specification)
+[31m|[m             - Element now correctly initializes also from an obj ( _ bug) (with
+[31m|[m       	constrains)
+[31m|[m       	- A Parameter is now a direct descendant of an Element. You can
+[31m|[m       	  also directly create a Parameter
+[31m|[m       	  - Value of a Parameter can be undefined. isValid and met_by are
+[31m|[m       	    not applied in this case
+[31m|[m       	    - _mpcv_hash debug. Now correctly reads parameters and
+[31m|[m       	      constraints. Also metavalues are correctly considered (type
+[31m|[m       	      and value)
+[31m|[m       	      - md5 replaced by sha1 in token generation
+[31m|[m       	      - If no name is provided for a parameter, Statemet defines a
+[31m|[m       		unique name for it
+[31m|[m       		- Statement.getAllParameters
+[31m|[m       		- Statement.getParameterNames
+[31m|[m       		- Constraints getters
+[31m|[m       		- Constraints.UNDEF now is null. This helps a lot in
+[31m|[m       		  checking if is defined
+[31m|[m       		  - Constraints creator cleaned and debugged
+[31m|[m       		  - From a Specification now is possible to get a
+[31m|[m       		    parameter value (getParameterValue)
+[31m|[m       		    - When we create an Element from a registry we
+[31m|[m       		      memorize also the registry object id in
+[31m|[m       		      _registryOID. It could be usefull also to register
+[31m|[m       		      the registry we are using.
+[31m|[m       		      - ResultColumn now correctly inherits from Element
+[31m|[m       			in nodeJs way
+[31m|[m       			- Statement resultcolumn rewritten and debugged.
+[31m|[m       			- Elements can be directly created by json with
+[31m|[m       			  the mandatory param type indicating the name of
+[31m|[m       			  the oid from the registry we want to load.
+[31m|[m       			  - Constraints: unparse_constraints is now a
+[31m|[m       			    global, not prototype, function
+[31m|[m       			    - Compliant with the standard messages of the
+[31m|[m       			      reference implementation (Capability ,
+[31m|[m       			      Specification , Result ).
+[31m|[m       			          - Sending a message does not require any
+[31m|[m       				    specifica action
+[31m|[m       				        - Decoding of a received message
+[31m|[m       					  (Statement) is done by means of
+[31m|[m       					  mPlane.from_dict, that returns
+[31m|[m       					  an instance of an object
+[31m|[m       					  contained in the message.
+[31m|[m       					        This same function can be
+[31m|[m       						of use for create any type
+[31m|[m       						of object from a JSON
+[31m|[m       						description
+[31m|[m       						- Parameter constructor
+[31m|[m       						  now works also with
+[31m|[m       						  _value
+[31m|[m       						  - cloning of objects
+[31m|[m       						    instead of simple copy
+[31m|[m       						    in Specification
+[31m|[m       						    - Constraints params
+[31m|[m       						      now correctly set by
+[31m|[m       						      addConstraint when
+[31m|[m       						      the config is a
+[31m|[m       						      String
+[31m|[m       						      - from_dict can
+[31m|[m       							receive a string
+[31m|[m       							or an object. If
+[31m|[m       							the object is a
+[31m|[m       							Buffer (the result
+[31m|[m       							of a http request)
+[31m|[m       							it directly
+[31m|[m       							convert to JSON.
+[31m|[m       							This is a very
+[31m|[m       							common case.
+[31m|[m       							- result and
+[31m|[m       							  ResultValues
+[31m|[m       							  correctly
+[31m|[m       							  adapted in rows
+[31m|[m       							  and column
+[31m|[m       							  format of the RI
+[31m|[m       							  (from_dict and
+[31m|[m       							  to_dict)
+[31m|[m       							  - BUG
+[31m|[m       							    scripting!
+[31m|[m  
+* [33mcommit 03f85cdf5be046920f168b859d2b23b8944b57cd[m
+  Author: invernizzi <fabrizio.invernizzi@telecomitalia.it>
+  Date:   Thu Oct 2 09:34:12 2014 +0200
+  
+      mPlane nodejs RI 0.0.5b.
+      
+      Sono debug coinsole.log active.
+  
+* [33mcommit d46a6c83c34ca8d38dba4b77a6e9af59d960b3c0[m
+[33m|[m Author: finvernizzi <fabrizio.invernizzi@telecomitalia.it>
+[33m|[m Date:   Tue May 20 10:13:24 2014 +0200
+[33m|[m 
+[33m|[m     travis.yml
+[33m|[m  
+* [33mcommit f5bca63b18a8f253791e07507057a3996ac14b41[m
+[33m|[m Author: finvernizzi <fabrizio.invernizzi@telecomitalia.it>
+[33m|[m Date:   Tue May 20 00:42:33 2014 +0200
+[33m|[m 
+[33m|[m     travis file
+[33m|[m  
+* [33mcommit b17678c78ac6fba78b391495125026dcbdf9a1ff[m
+[33m|[m Author: finvernizzi <fabrizio.invernizzi@telecomitalia.it>
+[33m|[m Date:   Tue May 20 00:08:02 2014 +0200
+[33m|[m 
+[33m|[m     Delete autogenerated mplane.html
+[33m|[m  
+* [33mcommit fc35c3c725fca2c3b2de91506747985734f5d094[m
+[33m|[m Author: finvernizzi <fabrizio.invernizzi@telecomitalia.it>
+[33m|[m Date:   Tue May 20 00:05:21 2014 +0200
+[33m|[m 
+[33m|[m     Some minor changes in the library.
+[33m|[m     Added a working supervisor and pinger in the Example dir.
+[33m|[m  
+* [33mcommit dc9b88b3075998b2b4d32f28a13da51277040e13[m
+  Author: finvernizzi <fabrizio.invernizzi@telecomitalia.it>
+  Date:   Mon May 19 23:55:33 2014 +0200
+  
+      Pinger and working supervisor added
+    
+*   [33mcommit 674a9d7872468f0457f7685cc113afde0b0643a5[m
+[34m|[m[35m\[m  Merge: be9805b de8bc9c
+[34m|[m [35m|[m Author: Fabrizio Invernizzi <fabrizio.invernizzi@telecomitalia.it>
+[34m|[m [35m|[m Date:   Tue Apr 15 12:13:19 2014 +0200
+[34m|[m [35m|[m 
+[34m|[m [35m|[m     Merge branch 'gh-pages' of https://github.com/finvernizzi/mplane into gh-pages
+[34m|[m [35m|[m   
+[34m|[m * [33mcommit de8bc9c4c98f00f532b245c193059c552a9fb273[m
+[34m|[m [35m|[m Author: Fabrizio Invernizzi <fabrizio.invernizzi@telecomitalia.it>
+[34m|[m [35m|[m Date:   Tue Apr 15 10:46:51 2014 +0200
+[34m|[m [35m|[m 
+[34m|[m [35m|[m     MErge
+[34m|[m [35m|[m     
+[34m|[m *   [33mcommit ba5cf8eb3ba90a58a331986c038d920a02154581[m
+[34m|[m [36m|[m[1;31m\[m  Merge: 1fe3efb bc1a90a
+[34m|[m [36m|[m [1;31m|[m Author: Fabrizio Invernizzi <fabrizio.invernizzi@telecomitalia.it>
+[34m|[m [36m|[m [1;31m|[m Date:   Tue Apr 15 10:45:14 2014 +0200
+[34m|[m [36m|[m [1;31m|[m 
+[34m|[m [36m|[m [1;31m|[m     Merge branch 'gh-pages' of https://github.com/finvernizzi/mplane into gh-pages
+[34m|[m [36m|[m [1;31m|[m    
+[34m|[m [36m|[m * [33mcommit bc1a90ab950c0284c5d88c6ed10e43c3ae6eb701[m
+[34m|[m [36m|[m [1;31m|[m Author: finvernizzi <fabrizio.invernizzi@telecomitalia.it>
+[34m|[m [36m|[m [1;31m|[m Date:   Mon Apr 14 17:12:35 2014 +0200
+[34m|[m [36m|[m [1;31m|[m 
+[34m|[m [36m|[m [1;31m|[m     Create index.html
+[34m|[m [36m|[m [1;31m|[m    
+[34m|[m * [1;31m|[m [33mcommit 1fe3efbd72cb8af0d9ad7abb57c44b980fadbcb3[m
+[34m|[m  [1;31m/[m  Author: Fabrizio Invernizzi <fabrizio.invernizzi@telecomitalia.it>
+[34m|[m [1;31m|[m   Date:   Tue Apr 15 10:40:21 2014 +0200
+[34m|[m [1;31m|[m   
+[34m|[m [1;31m|[m       First documentation version
+[34m|[m [1;31m|[m   
+* [1;31m|[m [33mcommit be9805b4cd9e821243cdd2cab5461d5cc790f48a[m
+[1;31m|[m[1;31m/[m  Author: Fabrizio Invernizzi <fabrizio.invernizzi@telecomitalia.it>
+[1;31m|[m   Date:   Tue Apr 15 12:06:05 2014 +0200
+[1;31m|[m   
+[1;31m|[m       Rimosso docs
+[1;31m|[m  
+* [33mcommit 667829e754ec3b40dc5fd4c30fbe44671db6beb0[m
+[1;31m|[m Author: Fabrizio Invernizzi <fabrizio.invernizzi@telecomitalia.it>
+[1;31m|[m Date:   Mon Apr 14 17:37:25 2014 +0200
+[1;31m|[m 
+[1;31m|[m     Some cleanup in the files
+[1;31m|[m    
+*   [33mcommit 6f42ea4807fcdbd4a1a251e3f2494497d6adbef6[m
+[1;32m|[m[1;33m\[m  Merge: 87b5a95 e5d0e8e
+[1;32m|[m [1;33m|[m Author: Fabrizio Invernizzi <fabrizio.invernizzi@telecomitalia.it>
+[1;32m|[m [1;33m|[m Date:   Mon Apr 14 17:31:38 2014 +0200
+[1;32m|[m [1;33m|[m 
+[1;32m|[m [1;33m|[m     Merge branch 'master' of https://github.com/finvernizzi/mplane
+[1;32m|[m [1;33m|[m     
+[1;32m|[m [1;33m|[m     Conflicts:
+[1;32m|[m [1;33m|[m     	README.md
+[1;32m|[m [1;33m|[m     	package.json
+[1;32m|[m [1;33m|[m     
+[1;32m|[m *   [33mcommit e5d0e8e12eaa8d30e14e73a42e12413853c9ddf6[m
+[1;32m|[m [1;34m|[m[1;35m\[m  Merge: 6510375 7317929
+[1;32m|[m [1;34m|[m [1;35m|[m Author: Fabrizio Invernizzi <fabrizio.invernizzi@telecomitalia.it>
+[1;32m|[m [1;34m|[m [1;35m|[m Date:   Mon Apr 14 17:08:33 2014 +0200
+[1;32m|[m [1;34m|[m [1;35m|[m 
+[1;32m|[m [1;34m|[m [1;35m|[m     Merge branch 'master' of https://github.com/finvernizzi/mplane
+[1;32m|[m [1;34m|[m [1;35m|[m     
+[1;32m|[m [1;34m|[m [1;35m|[m     Conflicts:
+[1;32m|[m [1;34m|[m [1;35m|[m     	README.md
+[1;32m|[m [1;34m|[m [1;35m|[m    
+[1;32m|[m [1;34m|[m * [33mcommit 7317929c9d06df4f83a180623db8f7b772cead00[m
+[1;32m|[m [1;34m|[m   Author: finvernizzi <fabrizio.invernizzi@telecomitalia.it>
+[1;32m|[m [1;34m|[m   Date:   Mon Apr 14 02:25:39 2014 -0700
+[1;32m|[m [1;34m|[m   
+[1;32m|[m [1;34m|[m       Initial commit
+[1;32m|[m [1;34m|[m   
+[1;32m|[m * [33mcommit 6510375c4945a33168e5e3778770e39486b5fb07[m
+[1;32m|[m   Author: Fabrizio Invernizzi <fabrizio.invernizzi@telecomitalia.it>
+[1;32m|[m   Date:   Mon Apr 14 17:03:01 2014 +0200
+[1;32m|[m   
+[1;32m|[m       First release 1.0.0a
+[1;32m|[m  
+* [33mcommit 87b5a951906f92e2ba88a94779d387fc8e57b734[m
+  Author: Fabrizio Invernizzi <fabrizio.invernizzi@telecomitalia.it>
+  Date:   Mon Apr 14 17:29:12 2014 +0200
+  
+      README.rd
