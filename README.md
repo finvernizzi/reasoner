@@ -27,7 +27,7 @@ npm install
 Done. You are ready to run the reasoner.
 
 #How does it work
-[![mPlane](http://www.ict-mplane.eu/sites/default/files//public/mplane_final_256x_0.png)](http://www.ict-mplane.eu/)
+[![mPlane](https://github.com/finvernizzi/reasoner/blob/master/reasoner.png)](#)  
 The reasoner works starting from a static description of the network done by means of a json file. On this description reasoner, interacting with a supervisor, maps available capabilities (delay.twoway) and tries to require measures in order to build a network status map. For each network node, a three level status is computed comparing average RTT with two static thresolds. 
 
 The work of the reasoner can be described in two main phases:
