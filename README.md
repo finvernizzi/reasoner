@@ -239,3 +239,8 @@ If a network hash a /32 IP, it is considered a leaf. Router are assumed to forwa
     }
 }
 ```
+
+
+
+#LICENSE
+This software is released under the [BSD](https://en.wikipedia.org/wiki/BSD_licenses#2-clause_license_.28.22Simplified_BSD_License.22_or_.22FreeBSD_License.22.29) license.
