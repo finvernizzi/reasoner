@@ -90,3 +90,122 @@ Configuration of the Reasoner is done on the reasoner.json file.
     }
 }
 ```
+
+##Main
+
+This section contains generic configuration information.
+`networkDefinitionFile` is the location if the file describing the static knowloedge of the network. See Below for an example.
+
+
+
+#Network description
+```json
+{
+    "gateways":{
+        "access-gw":{
+            "IPs":["192.168.123.130/30" ,"192.168.123.65/26" ]
+        },
+        "service-gw":{
+            "IPs":["192.168.123.1/26" , "192.168.123.130/30" ]
+        },
+        "internet-gw":{
+            "IPs":["192.168.123.129/30" , "217.57.160.197/27"]
+        },
+        "google-gw":{
+            "IPs":["173.194.112.1/24" , "217.57.160.197/27"]
+        }
+    },
+    "networks":{
+        "ServiceNet":{
+            "description" : "LAN dedicated to auxiliary services",
+            "subnet": "192.168.123.0/26",
+            "gateways" : ["service-gw"]
+        },
+        "Internet_Service_Provider":{
+            "description" : "Your Preferred Internet Service Provider",
+            "subnet": "192.168.123.128/30",
+            "gateways" : ["internet-gw" , "access-gw","service-gw"],
+            "type": "p2p"
+        },
+        "Internet":{
+            "description" : "Internet",
+            "subnet": "217.57.160.197/27",
+            "gateways" : ["internet-gw"]
+        },
+        "Access_net":{
+            "description" : "Access net",
+            "subnet": "192.168.123.65/26",
+            "gateways" : ["access-gw"]
+        },
+        "ServiceNode":{
+            "description" : "Node for services",
+            "subnet": "192.168.123.4/32",
+            "gateways" : ["service-gw"]
+        },
+        "user_66":{
+            "description" : "DHCP User 66",
+            "subnet": "192.168.123.66/32",
+            "gateways" : ["access-gw"]
+        },
+        "user_67":{
+            "description" : "DHCP User 67",
+            "subnet": "192.168.123.67/32",
+            "gateways" : ["access-gw"]
+        },
+        "user_68":{
+            "description" : "DHCP User 68",
+            "subnet": "192.168.123.68/32",
+            "gateways" : ["access-gw"]
+        },
+        "user_69":{
+            "description" : "DHCP User 69",
+            "subnet": "192.168.123.69/32",
+            "gateways" : ["access-gw"]
+        },
+        "user_70":{
+            "description" : "DHCP User 70",
+            "subnet": "192.168.123.70/32",
+            "gateways" : ["access-gw"]
+        },
+        "user_71":{
+            "description" : "DHCP User 71",
+            "subnet": "192.168.123.71/32",
+            "gateways" : ["access-gw"]
+        },
+        "user_72":{
+            "description" : "DHCP User 72",
+            "subnet": "192.168.123.72/32",
+            "gateways" : ["access-gw"]
+        },
+        "user_72":{
+            "description" : "DHCP User 72",
+            "subnet": "192.168.123.72/32",
+            "gateways" : ["access-gw"]
+        },
+        "user_73":{
+            "description" : "DHCP User 73",
+            "subnet": "192.168.123.73/32",
+            "gateways" : ["access-gw"]
+        },
+        "user_74":{
+            "description" : "DHCP User 74",
+            "subnet": "192.168.123.74/32",
+            "gateways" : ["access-gw"]
+        },
+        "google_cdn":{
+            "description" : "Google CDN Network",
+            "subnet": "173.194.112.0/24",
+            "gateways" : ["google-gw"],
+            "__shape": "image",
+            "__image": "./img/google.png"
+        },
+        "google":{
+            "description" : "Google Network",
+            "subnet": "173.194.112.127/32",
+            "gateways" : ["google-gw"],
+            "__shape": "image",
+            "__image": "./img/google.png"
+        }
+    }
+}
+```
