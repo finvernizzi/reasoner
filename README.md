@@ -39,6 +39,7 @@ The work of the reasoner can be described in two main phases:
 		* Discover available measures from supervisor
 		* Map measures on network graph
  * Run phase
+
 		* Iteratively run measures from usefull vantage points to any other points
 		* Keep Samples (circular array) per LAN (graph nodes)
 		* Periodically do stats and decide the status of a LAN
