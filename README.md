@@ -26,7 +26,7 @@ npm install
 Done. You are ready to run the reasoner.
 
 #How does it work
-[![mPlane](https://github.com/finvernizzi/reasoner/blob/master/reasoner.png)](#)  
+[![reasoner](https://github.com/finvernizzi/reasoner/blob/master/reasoner.png)](#)  
 The reasoner works starting from a static description of the network done by means of a json file. On this description the reasoner, interacting with a supervisor, maps available capabilities (*delay.twoway*) and tries to require measures in order to build a network status map. For each network node, a three level status is computed comparing average RTT with two static thresolds. 
 
 The work of the reasoner can be described in two main phases:
@@ -42,6 +42,21 @@ The work of the reasoner can be described in two main phases:
 		* Iteratively run measures from usefull vantage points to any other points
 		* Keep Samples (circular array) per LAN (graph nodes)
 		* Periodically do stats and decide the status of a LAN
+
+When in Run phase the Reasoner periodically:
+
+	* Calculates means values per node
+	* On the stored samples
+		* Compares means with 2 thresholds good, bad
+		* Tags the node as 
+			* ok (green)
+			* warning (yellow)
+			* nok (red)
+		* Build a vis.js description of the net
+
+The vis.js description is available through an embedded HTTP agent.  This file, visualized by [vis.js](http://visjs.org/) is a representation of the status of the netwrok as seen by the Reasoner.
+
+[![netstat](https://github.com/finvernizzi/reasoner/blob/master/network_status.png)](#) 
 
 #Configuration
 
@@ -95,10 +110,25 @@ Configuration of the Reasoner is done on the reasoner.json file.
 
 This section contains generic configuration information.
 `networkDefinitionFile` is the location if the file describing the static knowloedge of the network. See Below for an example.
+`mode` set the activation model of the reasoner activities. In auto mode (default) the reasoner start automatically the run phase after initialization, in triggered mode an HTTP listener waiting for a GET triggering the run status.
 
+##EXTTrigger
+
+Details for trigger mode.
+
+##delayAnalyzer
+
+Here you define thresholds for declaring the status of a network node. Values are in milliseconds.
+`rttThresoldGood` is the status below which a nde is considered in good status.
+`rttThresoldBad` is the status above which a nde is considered in bad status.
 
 
 #Network description
+
+In this section you can find an example of network description file.
+Netowrks are intended as LAN interconnected by gateways. The three is built automatically by the Reasoner comparing the subnet property of a network with the IPs of a gateway.  
+If a network hash a /32 IP, it is considered a leaf. Router are assumed to forward traffic between all the interconnected networks.
+
 ```json
 {
     "gateways":{
